@@ -8,7 +8,8 @@ class CKY:
 
 		Parameters
 		----------
-		grammar (CFG): The Context-Free Grammar to use for parsing.
+		grammar (CFG): The object representing the Context-Free Grammar (CFG)
+			in Chomsky Normal Form (CNF) to use for parsing.
 		"""
 		self.grammar: CFG = grammar
 
@@ -34,7 +35,8 @@ class CKY:
 
 		Parameters
 		----------
-		grammar (CFG): The grammar object to use for parsing.
+		grammar (CFG): The object representing the Context-Free Grammar (CFG)
+			in Chomsky Normal Form (CNF) to use for parsing.
 		"""
 		self.grammar = grammar
 
