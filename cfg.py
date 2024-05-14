@@ -1,27 +1,41 @@
+from typing import Any, Self
+import warnings
+
 class CFG:
 	"""
 	A class to represent a Context-Free Grammar (CFG) and provide methods to work with it.
 	"""
-	def __init__(self, rules: dict, terminals: set|None=None, non_terminals: set|None=None) -> None:
+	def __init__(self, rules: dict) -> None:
 		"""
 		Initializes the CKY parser with a given Context-Free Grammar (CFG).
+
+		The CFG is stored in Chomsky Normal Form (CNF) internally, so the rules are converted to CNF if they are not already in CNF.
 
 		Parameters
 		----------
 		rules (dict): A dictionary of rules in the form of {Symbol: [Production1, Production2, ...]}.
-		terminals (set): A set of terminal symbols. If None, the terminal symbols are inferred from the rules.
-		non_terminals (set): A set of non-terminal symbols. If None, the non-terminal symbols are inferred from the rules.
 		"""
-		assert (terminals is None) == (non_terminals is None), "Both terminals and non-terminals must be provided or omitted."
-		
-		if terminals is None or non_terminals is None:
-			terminals, non_terminals = self.find_symbols()
-		
 		self.rules: dict = rules
-		self.terminals: set = terminals
-		self.non_terminals: set = non_terminals
+		self.terminals, self.non_terminals = self.find_symbols()
 
-		self.is_cnf: bool = self.check_cnf()
+		if not self.check_cnf():
+			self.to_cnf()
+			warnings.warn("The provided CFG is not in CNF. Converted to CNF. Some rules and symbols may have changed.", UserWarning)
+
+	def __call__(self, symbol: str) -> list:
+		"""
+		Allows the CFG object to be called as a function to get the productions for a given symbol.
+
+		Parameters
+		----------
+		symbol (str): The symbol for which to get the productions.
+
+		Returns
+		-------
+		list
+			List of productions for the given symbol.
+		"""
+		return self.get_rule(symbol)
 
 	def find_symbols(self) -> tuple[set, set]:
 		"""
@@ -71,18 +85,14 @@ class CFG:
 		
 		return True
 	
-	def to_cnf(self) -> dict:
+	def to_cnf(self) -> None:
 		"""
-		Returns the Chomsky Normal Form (CNF) representation of the CFG.
+		Converts the grammar to Chomsky Normal Form (CNF).
 
-		Returns
-		-------
-		dict
-			Dictionary of rules in CNF.
-		"""
-		if self.is_cnf:
-			return self.rules
-		
+		A CFG is in CNF if all its rules are of the form:
+		- A -> a, where A is a non-terminal symbol and a is a terminal symbol.
+		- A -> BC, where A, B, and C are non-terminal symbols.
+		"""		
 		pass
 	
 	def is_terminal(self, symbol: str) -> bool:
@@ -137,6 +147,21 @@ class CFG:
 		"""
 		return self.non_terminals
 	
+	def get_rule(self, symbol: str) -> list:
+		"""
+		Returns the list of productions for a given symbol.
+
+		Parameters
+		----------
+		symbol (str): The symbol for which to get the productions.
+
+		Returns
+		-------
+		list
+			List of productions for the given symbol.
+		"""
+		return self.rules.get(symbol, [])
+	
 	def get_rules(self) -> dict:
 		"""
 		Returns the rules of the grammar.
@@ -173,7 +198,6 @@ class CFG:
 		self.rules[symbol].append(production)
 
 		self.terminals, self.non_terminals = self.find_symbols()
-		self.is_cnf = self.check_cnf()
 
 	def remove_rule(self, symbol: str, production: str) -> None:
 		"""
@@ -190,3 +214,14 @@ class CFG:
 
 		self.terminals, self.non_terminals = self.find_symbols()
 		self.is_cnf = self.check_cnf()
+
+	def __repr__(self) -> str:
+		"""
+		Creates a string representation of the CFG object.
+
+		Returns
+		-------
+		str
+			String representation of the CFG object.
+		"""
+		return f"CFG({self.rules})"
