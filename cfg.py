@@ -1,4 +1,3 @@
-from typing import Any, Self
 import warnings
 
 class CFG:
@@ -14,6 +13,8 @@ class CFG:
 
 		The CFG is stored in Chomsky Normal Form (CNF) internally, so the rules are converted to CNF if they are not already in CNF.
 
+		The symbols must be single characters (strings of length 1): uppercase for non-terminal symbols and lowercase for terminal symbols.
+
 		Parameters
 		----------
 		rules (dict): A dictionary of rules in the form of {Symbol: [Production1, Production2, ...], ...}.
@@ -27,11 +28,11 @@ class CFG:
 
 		self.terminals, self.non_terminals = self.find_symbols(start_symbol=start_symbol)
 
+		self.start_symbol: str = start_symbol if start_symbol is not None else self.find_start_symbol()
+
 		if not self.check_cnf():
 			warnings.warn("The provided CFG is not in CNF. Converting to CNF. Some productions and symbols may change.", UserWarning)
 			self.to_cnf()
-
-		self.start_symbol: str = start_symbol if start_symbol is not None else self.find_start_symbol()
 
 	def __call__(self, symbol: str) -> list:
 		"""
@@ -78,7 +79,7 @@ class CFG:
 
 	def replace_epsilon(self) -> None:
 		"""
-		Replaces empty strings with the epsilon symbol in the grammar.
+		Replaces empty strings with the epsilon symbol (ε) in the grammar rules.
 		"""
 		for symbol, productions in self.rules.items():
 			for production in productions:
@@ -88,14 +89,14 @@ class CFG:
 
 	def find_symbols(self, start_symbol: str|None) -> tuple[set, set]:
 		"""
-		Finds the terminal and non-terminal symbols in the grammar.
+		Finds the terminal and non-terminal symbols in the grammar, checks if they are in the correct format, and returns them.
 
 		The terminal symbols are the ones that are only produced and never produce any other symbol,
-		while the non-terminal symbols are the ones that produce other symbols.
+		while the non-terminal symbols are the ones that produce other symbols and can be produced by other symbols.
 
 		Parameters
 		----------
-		start_symbol (str, optional): The start symbol specified by the user.
+		start_symbol (str, None): The start symbol specified by the user.
 
 		Returns
 		-------
@@ -105,9 +106,14 @@ class CFG:
 		Raises
 		------
 		ValueError
+			If the terminal symbols are not lowercase or the non-terminal symbols are not uppercase.
+		ValueError
 			If there are symbols that produce other symbols but are not produced by any other symbol (cannot be reached).
 		"""
 		non_terminals = set(char for char in self.rules.keys())
+
+		if any(not symbol.isupper() for symbol in non_terminals):
+			raise ValueError("The grammar is not correct. All non-terminal symbols must be uppercase.")
 
 		terminals = set()
 		non_terminals_produced = set()
@@ -118,6 +124,9 @@ class CFG:
 						terminals.add(char)
 					else:
 						non_terminals_produced.add(char)
+
+		if any(not symbol.islower() for symbol in terminals):
+			raise ValueError("The grammar is not correct. All terminal symbols must be lowercase.")
 
 		if start_symbol is not None:
 			not_reached = non_terminals - non_terminals_produced
@@ -140,13 +149,13 @@ class CFG:
 		ValueError
 			If the start symbol cannot be inferred from the grammar rules.
 		"""
-		producted_symbols = set()
+		produced_symbols = set()
 		for productions in self.rules.values():
 			for production in productions:
 				for char in production:
-					producted_symbols.add(char)
+					produced_symbols.add(char)
 
-		candidates = self.non_terminals - producted_symbols
+		candidates = self.non_terminals - produced_symbols
 
 		if not candidates or len(candidates) > 1:
 			raise ValueError("Could not infer the start symbol, more than 1 candidate found.  Please provide the start symbol explicitly and ensure that the grammar is correct.")
@@ -190,7 +199,17 @@ class CFG:
 		A CFG is in CNF if all its rules are of the form:
 		- A -> a, where A is a non-terminal symbol and a is a terminal symbol.
 		- A -> BC, where A, B, and C are non-terminal symbols.
-		"""		
+		"""
+		# ADD CODE HERE
+
+		try:
+			self.assert_valid_format()
+		except ValueError:
+			raise ValueError("The CFG could not be converted to CNF. Please check the grammar and try again.")
+		self.replace_epsilon()
+		self.terminals, self.non_terminals = self.find_symbols(start_symbol=self.start_symbol)
+		self.start_symbol = self.find_start_symbol()
+		
 		pass
 	
 	def is_terminal(self, symbol: str) -> bool:
@@ -294,16 +313,16 @@ class CFG:
 
 	def __str__(self) -> str:
 		"""
-		Creates a string representation of the CFG object.
+		Returns a string that represents the CFG object in a readable format.
 
 		Returns
 		-------
 		str
-			String representation of the CFG object.
+			String showing the CFG object in a readable format.
 		"""
 		dict_string = '\n'.join(f"\t{key} --> {' | '.join(sorted(value))}" for key, value in self.rules.items())
 		terminals_string = ', '.join(sorted(self.terminals))
-		non_terminals_string = ', '.join(sorted(self.non_terminals))
+		non_terminals_string = ', '.join([self.start_symbol] + list(sorted(self.non_terminals - {self.start_symbol})))
 		
 		return f"CFG(\n{dict_string}\n)\n" \
 			f"\n* Start Symbol: {self.start_symbol}" \
