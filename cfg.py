@@ -33,9 +33,11 @@ class CFG:
 
 		self.available_non_terminals = sorted(list(set("ABCDEFGHIJKLMNOPQRSTUVWXYZ") - self.non_terminals), reverse=True)
 
+		print("Initial CFG:", self)
+
 		if not self.check_cnf():
 			warnings.warn("The provided CFG is not in CNF. Converting to CNF. Some productions and symbols may change.", UserWarning)
-			#self.to_cnf()
+			self.to_cnf()
 
 	def __call__(self, symbol: str) -> list:
 		"""
@@ -85,10 +87,7 @@ class CFG:
 		Replaces empty strings with the epsilon symbol (ε) in the grammar rules.
 		"""
 		for symbol, productions in self.rules.items():
-			for production in productions:
-				if production == "":
-					productions.remove(production)
-					productions.append(self.EPSILON)
+			self.rules[symbol] = [prod if prod else self.EPSILON for prod in productions]
 
 	def find_symbols(self, start_symbol: str|None) -> tuple[set, set]:
 		"""
@@ -119,21 +118,17 @@ class CFG:
 			raise ValueError("The grammar is not correct. All non-terminal symbols must be uppercase.")
 
 		terminals = set()
-		non_terminals_produced = set()
 		for productions in self.rules.values():
 			for production in productions:
 				for char in production:
 					if char not in non_terminals:
 						terminals.add(char)
-					else:
-						non_terminals_produced.add(char)
 
 		if any(not symbol.islower() for symbol in terminals):
 			raise ValueError("The grammar is not correct. All terminal symbols must be lowercase.")
 
 		if start_symbol is not None:
-			not_reached = non_terminals - non_terminals_produced
-			if not_reached and not_reached.pop() != start_symbol:
+			if non_terminals - self.__get_reachable_non_terminals(start_symbol=start_symbol, non_terminals=non_terminals):
 				raise ValueError("The grammar is not correct. Some symbols produce other symbols but are not produced by any other symbol (cannot be reached).")
 
 		return terminals, non_terminals
@@ -161,7 +156,7 @@ class CFG:
 		candidates = self.non_terminals - produced_symbols
 
 		if not candidates or len(candidates) > 1:
-			raise ValueError("Could not infer the start symbol, more than 1 candidate found.  Please provide the start symbol explicitly and ensure that the grammar is correct.")
+			raise ValueError("Could not infer the start symbol, more than 1 candidate found. Please provide the start symbol explicitly and ensure that the grammar is correct.")
 
 		start_symbol = candidates.pop() # Get the non-terminal symbol that is not produced by any other symbol
 
@@ -204,21 +199,19 @@ class CFG:
 		- A -> BC, where A, B, and C are non-terminal symbols.
 		"""
 		self.create_new_start_symbol()
-		print("Set new start symbol: \n", self)
 		self.remove_null_productions()
-		print("Remove null productions: \n", self)
 		self.remove_unit_productions()
-		print("Remove unit productions: \n", self)
 		self.__remove_unreachable_productions()
-		print("Remove unreachable productions: \n", self)
 		self.convert_to_binary_and_terminal_productions()
-		print("All done: \n", self)
+
+		print("Converted to CNF:", self)
 
 		try:
 			self.assert_valid_format()
 		except ValueError:
 			raise ValueError("The CFG could not be converted to CNF. Please check the grammar and try again.")
 		self.replace_epsilon()
+
 		self.terminals, self.non_terminals = self.find_symbols(start_symbol=self.start_symbol)
 		self.start_symbol = self.find_start_symbol()
 
@@ -227,7 +220,7 @@ class CFG:
 		Step 1 to convert CFG to CNF: 
 		Creates a new symbol that only produces the original start symbol and adds it to the grammar rules.
 		"""
-		new_start_symbol = self.available_non_terminals.pop()
+		new_start_symbol = self.create_non_terminal()
 		self.rules[new_start_symbol] = [self.start_symbol]
 		self.non_terminals.add(new_start_symbol)
 
@@ -237,34 +230,36 @@ class CFG:
 		Identify all nullable non-terminals (non-terminals that derive epsilon). 
 		Remove the null productions and adjust other productions accordingly.
 		"""
-		self.is_nullable_dict = {}
+		if self.EPSILON in self.terminals:
 
-		# Find all nullable symbols and remove the epsilon from the productions
-		nullable = self.__get_nullable_symbols()
-		non_nullable = self.non_terminals - nullable
+			self.is_nullable_dict = {}
 
-		print("Nullable: ", nullable)
+			# Find all nullable symbols and remove the epsilon from the productions
+			nullable = self.__get_nullable_symbols()
+			# non_nullable = self.non_terminals - nullable
 
-		new_rules = {}
+			new_rules = {}
 
-		# Add all combinations of nullable symbols to the productions of the non-nullable symbols
-		for symbol in self.non_terminals:
-			new_productions = set()
-			productions = self.rules[symbol]
-			for production in productions:
-				if production != self.EPSILON:
-					new_productions.add(production)
-					nullable_positions = [i for i, char in enumerate(production) if char in nullable]
-					for i in range(1, len(nullable_positions) + 1):
-						for combination in combinations(nullable_positions, i):
-							new_production = ''.join(
-								char for idx, char in enumerate(production) if idx not in combination
-							)
-							if new_production:
-								new_productions.add(new_production)
-			new_rules[symbol] = list(new_productions)
+			# Add all combinations of nullable symbols to the productions of the non-nullable symbols
+			for symbol in self.non_terminals:
+				new_productions = set()
+				productions = self.rules[symbol]
+				for production in productions:
+					if production != self.EPSILON:
+						new_productions.add(production)
+						nullable_positions = [i for i, char in enumerate(production) if char in nullable]
+						for i in range(1, len(nullable_positions) + 1):
+							for combination in combinations(nullable_positions, i):
+								new_production = ''.join(
+									char for idx, char in enumerate(production) if idx not in combination
+								)
+								if new_production:
+									new_productions.add(new_production)
+				new_rules[symbol] = list(new_productions)
 
-		self.rules = new_rules
+			self.terminals.remove(self.EPSILON)
+
+			self.rules = new_rules
 
 	def __get_nullable_symbols(self):
 		"""
@@ -317,20 +312,33 @@ class CFG:
 		Step 4 to convert CFG to CNF:
 		Remove all unreachable productions from the grammar.
 		"""
-		reachable = self.__get_reachable_non_terminals()
+		reachable = self.__get_reachable_non_terminals(start_symbol=self.start_symbol, non_terminals=self.non_terminals)
 		self.rules = {nt: prods for nt, prods in self.rules.items() if nt in reachable}
 		self.non_terminals = reachable
 
-	def __get_reachable_non_terminals(self):
+	def __get_reachable_non_terminals(self, start_symbol: str, non_terminals: set):
+		"""
+		Identifies all reachable non-terminals in the grammar.
+
+		Parameters
+		----------
+		start_symbol (str): The start symbol of the grammar.
+		non_terminals (set): The set of non-terminal symbols in the grammar.
+
+		Returns
+		-------
+		set
+			Set of reachable non-terminal symbols.
+		"""
 		reachable = set()
-		to_process = [self.start_symbol]
+		to_process = [start_symbol]
 		while to_process:
 			current = to_process.pop()
 			if current not in reachable:
 				reachable.add(current)
 				for production in self.rules.get(current, []):
 					for symbol in production:
-						if symbol in self.non_terminals:
+						if symbol in non_terminals:
 							to_process.append(symbol)
 		return reachable
 
@@ -339,7 +347,119 @@ class CFG:
 		Step 5 to convert CFG to CNF:
 		Convert all productions to binary and terminal productions.
 		"""
-		pass
+		self.__convert_long_productions()
+		self.__convert_binary_productions()
+
+	def __convert_long_productions(self):
+		"""
+		Converts long productions to binary productions.
+		"""
+		new_rules = {}
+
+		for symbol, productions in self.rules.items():
+			new_productions = set()
+			for production in productions:
+				if len(production) <= 2:
+					new_productions.add(production)
+				else:
+					while len(production) > 2:		
+						new_production = ''
+
+						# Split long production into binary productions
+						production_pairs = [production[i:i+2] for i in range(0, len(production), 2)] # The last pair may have a single symbol if the length is odd
+
+						# Create new non-terminal symbols for the pairs
+						for pair in production_pairs:
+							if len(pair) == 1:
+								new_production += pair
+							else:
+								new_nt = self.get_or_create_non_terminal([pair], rules=new_rules)
+								new_production += new_nt
+
+								new_rules[new_nt] = [pair]
+
+						# Update the production to the new production
+						production = new_production
+
+					new_productions.add(new_production)
+
+			new_rules[symbol] = list(new_productions)
+
+		self.rules = new_rules
+
+	def __convert_binary_productions(self):
+		"""
+		Converts binary productions with terminals to binary productions with non-terminals.
+		"""
+		new_rules = {}
+		for symbol, productions in self.rules.items():
+			updated_productions = set()
+			for production in productions:
+				if len(production) == 2:
+					
+					# Handle t-t combinations
+					if self.is_terminal(production[0]) and self.is_terminal(production[1]):
+						first_new_nt = self.get_or_create_non_terminal([production[0]], rules=new_rules)
+						second_new_nt = self.get_or_create_non_terminal([production[1]], rules=new_rules)
+						updated_productions.add(first_new_nt + second_new_nt)
+
+						new_rules[first_new_nt] = [production[0]]
+						new_rules[second_new_nt] = [production[1]]
+					
+					# Handle t-nt combinations
+					elif self.is_terminal(production[0]) and self.is_non_terminal(production[1]):
+						new_nt = self.get_or_create_non_terminal([production[0]], rules=new_rules)
+						updated_productions.add(new_nt + production[1])
+
+						new_rules[new_nt] = [production[0]]
+
+					# Handle nt-t combinations
+					elif self.is_non_terminal(production[0]) and self.is_terminal(production[1]):
+						new_nt = self.get_or_create_non_terminal([production[1]], rules=new_rules)
+						updated_productions.add(production[0] + new_nt)
+
+						new_rules[new_nt] = [production[1]]
+					
+					# Handle nt-nt combinations (correct format)
+					else:
+						updated_productions.add(production)
+				else:
+					updated_productions.add(production)
+			
+			new_rules[symbol] = list(updated_productions)
+		
+		self.rules = new_rules
+
+	def create_non_terminal(self) -> str:
+		"""
+		Helper function to create a new non-terminal symbol.
+		"""
+		assert self.available_non_terminals, "The grammart has run out of non-terminal symbols. It cannot be converted to CNF."
+		
+		new_nt = self.available_non_terminals.pop()
+		self.non_terminals.add(new_nt)
+		return new_nt
+	
+	def get_or_create_non_terminal(self, rhs: list, rules: dict|None=None) -> str:
+		"""
+		Helper function to get an existing non-terminal symbol or create a new one if it does not exist.
+
+		Parameters
+		----------
+		rhs (list): The right-hand side of the production.
+		rules (dict, optional): The rules of the grammar. If not provided, the rules of the current grammar are used.
+
+		Returns
+		-------
+
+		"""
+		existing_nt = self.get_symbol(rhs, rules)
+		
+		if existing_nt is None:
+			new_nt = self.create_non_terminal()
+			return new_nt
+		
+		return existing_nt
 	
 	def is_terminal(self, symbol: str) -> bool:
 		"""
@@ -419,8 +539,26 @@ class CFG:
 		"""
 		return self.rules.get(symbol, [])
 	
-	def get_symbol(self, production: list|str) -> str:
-		pass
+	def get_symbol(self, rhs: list, rules: dict|None=None) -> None|str:
+		"""
+		Returns the symbol exactly produces the given production.
+
+		Parameters
+		----------
+		production (list): The production to find the symbol for.
+		rules (dict): The rules of the grammar. If not provided, the rules of the current grammar are used.
+
+		Returns
+		-------
+		None|str
+			The symbol that produces the given production. None if the production is not found.
+		"""
+		rules = rules if rules is not None else self.rules
+		for symbol, productions in rules.items():
+			if rhs == productions:
+				return symbol
+		
+		return None
 	
 	def get_rules(self) -> dict:
 		"""
