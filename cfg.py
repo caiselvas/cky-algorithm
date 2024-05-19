@@ -1,4 +1,5 @@
 import warnings
+from itertools import combinations
 
 class CFG:
 	"""
@@ -30,9 +31,11 @@ class CFG:
 
 		self.start_symbol: str = start_symbol if start_symbol is not None else self.find_start_symbol()
 
+		self.available_non_terminals = sorted(list(set("ABCDEFGHIJKLMNOPQRSTUVWXYZ") - self.non_terminals), reverse=True)
+
 		if not self.check_cnf():
 			warnings.warn("The provided CFG is not in CNF. Converting to CNF. Some productions and symbols may change.", UserWarning)
-			self.to_cnf()
+			#self.to_cnf()
 
 	def __call__(self, symbol: str) -> list:
 		"""
@@ -200,7 +203,16 @@ class CFG:
 		- A -> a, where A is a non-terminal symbol and a is a terminal symbol.
 		- A -> BC, where A, B, and C are non-terminal symbols.
 		"""
-		# ADD CODE HERE
+		self.create_new_start_symbol()
+		print("Set new start symbol: \n", self)
+		self.remove_null_productions()
+		print("Remove null productions: \n", self)
+		self.remove_unit_productions()
+		print("Remove unit productions: \n", self)
+		self.__remove_unreachable_productions()
+		print("Remove unreachable productions: \n", self)
+		self.convert_to_binary_and_terminal_productions()
+		print("All done: \n", self)
 
 		try:
 			self.assert_valid_format()
@@ -209,7 +221,124 @@ class CFG:
 		self.replace_epsilon()
 		self.terminals, self.non_terminals = self.find_symbols(start_symbol=self.start_symbol)
 		self.start_symbol = self.find_start_symbol()
-		
+
+	def create_new_start_symbol(self) -> None:
+		"""
+		Step 1 to convert CFG to CNF: 
+		Creates a new symbol that only produces the original start symbol and adds it to the grammar rules.
+		"""
+		new_start_symbol = self.available_non_terminals.pop()
+		self.rules[new_start_symbol] = [self.start_symbol]
+		self.non_terminals.add(new_start_symbol)
+
+	def remove_null_productions(self) -> None:
+		"""
+		Step 2 to convert CFG to CNF: 
+		Identify all nullable non-terminals (non-terminals that derive epsilon). 
+		Remove the null productions and adjust other productions accordingly.
+		"""
+		self.is_nullable_dict = {}
+
+		# Find all nullable symbols and remove the epsilon from the productions
+		nullable = self.__get_nullable_symbols()
+		non_nullable = self.non_terminals - nullable
+
+		print("Nullable: ", nullable)
+
+		new_rules = {}
+
+		# Add all combinations of nullable symbols to the productions of the non-nullable symbols
+		for symbol in self.non_terminals:
+			new_productions = set()
+			productions = self.rules[symbol]
+			for production in productions:
+				if production != self.EPSILON:
+					new_productions.add(production)
+					nullable_positions = [i for i, char in enumerate(production) if char in nullable]
+					for i in range(1, len(nullable_positions) + 1):
+						for combination in combinations(nullable_positions, i):
+							new_production = ''.join(
+								char for idx, char in enumerate(production) if idx not in combination
+							)
+							if new_production:
+								new_productions.add(new_production)
+			new_rules[symbol] = list(new_productions)
+
+		self.rules = new_rules
+
+	def __get_nullable_symbols(self):
+		"""
+		Identifies all nullable symbols (non-terminals that derive epsilon).
+		"""
+		nullable = set()
+		changed = True
+
+		while changed:
+			changed = False
+			for nt in self.non_terminals:
+				if nt not in nullable:
+					for production in self.rules[nt]:
+						if all(char in nullable or char == self.EPSILON for char in production):
+							nullable.add(nt)
+							changed = True
+							break
+		return nullable
+
+	def remove_unit_productions(self) -> None:
+		"""
+		Step 3 to convert CFG to CNF: 
+		Remove all unit productions from the grammar.
+		"""
+		new_rules = {nt: set() for nt in self.non_terminals}
+
+		# Step 1: Propagate rules
+		for nt in self.non_terminals:
+			to_process = [nt]
+			visited = set()
+			while to_process:
+				current = to_process.pop()
+				if current in visited:
+					continue
+				visited.add(current)
+				for production in self.rules[current]:
+					if len(production) == 1 and production in self.non_terminals:
+						to_process.append(production)
+					else:
+						new_rules[nt].add(production)
+
+		# Step 2: Remove unit productions that map a non-terminal to another non-terminal
+		for nt in self.non_terminals:
+			new_rules[nt] = {prod for prod in new_rules[nt] if not (len(prod) == 1 and prod in self.non_terminals)}
+
+		self.rules = {nt: list(productions) for nt, productions in new_rules.items()}
+
+	def __remove_unreachable_productions(self) -> None:
+		"""
+		Step 4 to convert CFG to CNF:
+		Remove all unreachable productions from the grammar.
+		"""
+		reachable = self.__get_reachable_non_terminals()
+		self.rules = {nt: prods for nt, prods in self.rules.items() if nt in reachable}
+		self.non_terminals = reachable
+
+	def __get_reachable_non_terminals(self):
+		reachable = set()
+		to_process = [self.start_symbol]
+		while to_process:
+			current = to_process.pop()
+			if current not in reachable:
+				reachable.add(current)
+				for production in self.rules.get(current, []):
+					for symbol in production:
+						if symbol in self.non_terminals:
+							to_process.append(symbol)
+		return reachable
+
+	def convert_to_binary_and_terminal_productions(self) -> None:
+		"""
+		Step 5 to convert CFG to CNF:
+		Convert all productions to binary and terminal productions.
+		"""
 		pass
 	
 	def is_terminal(self, symbol: str) -> bool:
@@ -290,6 +419,9 @@ class CFG:
 		"""
 		return self.rules.get(symbol, [])
 	
+	def get_symbol(self, production: list|str) -> str:
+		pass
+	
 	def get_rules(self) -> dict:
 		"""
 		Returns the rules of the grammar.
@@ -320,9 +452,10 @@ class CFG:
 		str
 			String showing the CFG object in a readable format.
 		"""
-		dict_string = '\n'.join(f"\t{key} --> {' | '.join(sorted(value))}" for key, value in self.rules.items())
+		non_terminals_order = [self.start_symbol] + list(sorted(self.non_terminals - {self.start_symbol}))
 		terminals_string = ', '.join(sorted(self.terminals))
-		non_terminals_string = ', '.join([self.start_symbol] + list(sorted(self.non_terminals - {self.start_symbol})))
+		non_terminals_string = ', '.join(non_terminals_order)
+		dict_string = '\n'.join(f"\t{key} --> {' | '.join(sorted(value))}" for key, value in zip(non_terminals_order, [self.rules[symbol] for symbol in non_terminals_order]))
 		
 		return f"CFG(\n{dict_string}\n)\n" \
 			f"\n* Start Symbol: {self.start_symbol}" \
