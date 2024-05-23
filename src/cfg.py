@@ -4,7 +4,7 @@ from collections import deque, defaultdict
 
 class CFG:
 	"""
-	A class to represent a Context-Free Grammar (CFG) and provide methods to work with it.
+	A class to represent a Context-Free Grammar (CFG) or Probabilistic Context-Free Grammar (PCFG) in Chomsky Normal Form (CNF).
 	"""
 	
 	EPSILON = 'ε'
@@ -131,8 +131,9 @@ class CFG:
 						raise ValueError("All individual probabilities must be integers or floats.")
 			
 			if self.probabilistic:
-				if not sum(probability for _, probability in rhs) == 1:
-					raise ValueError("The probabilities of the productions for each symbol must sum up to 1.")
+				prob_sum = sum(probability for _, probability in rhs)
+				if prob_sum != 1:
+					raise ValueError(f"The probabilities of the productions for each symbol must sum up to 1. For the symbol '{lhs}', the sum is {prob_sum}.")
 
 	def improve_format(self) -> None:
 		"""
