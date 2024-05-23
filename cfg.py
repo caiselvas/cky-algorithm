@@ -43,7 +43,7 @@ class CFG:
 
 		self.available_nonterminals = self.generate_available_nonterminals()
 
-		print("Initial CFG:\n", self)
+		print("Initial rules:", self, sep='\n')
 
 		if not self.is_cnf():
 			warnings.warn("The provided CFG is not in CNF. Converting to CNF. Some productions and symbols may change.", UserWarning)
@@ -100,10 +100,10 @@ class CFG:
 		ValueError
 			If the grammar is not in the correct format.
 		"""
-		if not isinstance(self.rules, dict):
+		if not isinstance(rules, dict):
 			raise ValueError("The grammar must be provided as a dictionary of rules in the form of {Symbol: {Production1, Production2, ...}, ...}.")
 		
-		for lhs, rhs in self.rules.items():
+		for lhs, rhs in rules.items():
 			if not isinstance(lhs, str):
 				raise ValueError("All symbols must be strings.")
 			if len(lhs) != 1:
