@@ -46,7 +46,7 @@ class CFG:
 
 		self.available_nonterminals = self.generate_available_nonterminals()
 
-		print("Initial rules:", self, sep='\n')
+		print("\nInitial rules:", self, sep='\n')
 
 		if self.probabilistic:
 			assert self.is_cnf(), "The provided PCFG is not in CNF. Please provide a PCFG in CNF."
@@ -554,6 +554,17 @@ class CFG:
 		lhs (str): The left-hand side of the rule to remove.
 		"""
 		self.rules.pop(lhs, None)
+
+	def is_probabilistic(self) -> bool:
+		"""
+		Checks if the grammar is probabilistic (PCFG).
+
+		Returns
+		-------
+		bool
+			True if the grammar is probabilistic, False otherwise.
+		"""
+		return self.probabilistic
 	
 	def is_terminal(self, symbol: str) -> bool:
 		"""
