@@ -755,6 +755,7 @@ class CFG:
 							queue.append((new_string, current_word))
 					break  # Only expand the first nonterminal symbol
 
+		print()
 		return words
 
 	def __str__(self) -> str:
