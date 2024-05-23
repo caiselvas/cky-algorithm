@@ -334,7 +334,7 @@ class CFG:
 		self.terminals, self.nonterminals = self.find_symbols(start_symbol=self.start_symbol)
 		self.start_symbol = self.find_start_symbol()
 
-		print("Converted CFG to CNF:\n", self)
+		print("Converted CFG to CNF:", self, sep='\n')
 
 		assert self.is_cnf(), "The CFG could not be converted to CNF successfully."
 
