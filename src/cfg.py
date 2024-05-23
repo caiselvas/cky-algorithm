@@ -50,10 +50,12 @@ class CFG:
 
 		if self.probabilistic:
 			assert self.is_cnf(), "The provided PCFG is not in CNF. Please provide a PCFG in CNF."
+			self.precalculated_lhs = self.precalculate_lhs()
 		else:
 			if not self.is_cnf():
 					warnings.warn("The provided CFG is not in CNF. Converting to CNF. Some productions and symbols may change.", UserWarning)
 					self.to_cnf()
+					self.precalculated_lhs = self.precalculate_lhs()
 
 	def __call__(self, symbol: str) -> list:
 		"""
@@ -335,6 +337,22 @@ class CFG:
 		print("Converted CFG to CNF:\n", self)
 
 		assert self.is_cnf(), "The CFG could not be converted to CNF successfully."
+
+	def precalculate_lhs(self) -> dict[str, str]:
+		"""
+		Precalculates the left-hand side symbols for the right-hand side productions for faster access.
+
+		Returns
+		-------
+		dict
+			Dictionary of precalculated left-hand side symbols for the right-hand side productions.
+		"""
+		precalculated_lhs = defaultdict(set)
+		for lhs, rhs in self.rules.items():
+			for production in rhs:
+				precalculated_lhs[production].add(lhs)
+
+		return dict(precalculated_lhs)
 
 	def remove_start_symbol_from_rhs(self) -> None:
 		"""
@@ -661,7 +679,7 @@ class CFG:
 		"""
 		return self.probabilities.get(lhs, {}).get(production, 0)
 	
-	def get_lhs(self, produced_rhs: set|str, rules: dict[str, set[str]]|None=None) -> None|str:
+	def get_lhs(self, produced_rhs: set|str, rules: dict[str, set[str]]|None=None, exact_match: bool=True) -> None|str|set[str]:
 		"""
 		Returns the symbol exactly produces the given production.
 
@@ -669,22 +687,44 @@ class CFG:
 		----------
 		produced_rhs (set|str): The production to find the symbol for. If it is a str, it is converted to a set(str).
 		rules (dict, optional): The rules of the grammar. If not provided, the rules of the current grammar are used.
+		exact_match (bool): Whether to find the exact match or the subset match. Default is True.
 
 		Returns
 		-------
-		None|str
+		None|str|set
 			The symbol that produces the given production. None if the production is not found.
+			If exact_match is False, a set of symbols that produce the given production is returned.
 		"""
 		if isinstance(produced_rhs, str):
 			produced_rhs = {produced_rhs}
 
 		rules = rules if rules is not None else self.rules
 
-		for lhs, rhs in rules.items():
-			if produced_rhs == rhs:
-				return lhs
+		if exact_match:
+			for lhs, rhs in rules.items():
+				if produced_rhs == rhs:
+					return lhs
+
+		else:
+			matches = set()
+			for lhs, rhs in rules.items():
+				if produced_rhs.issubset(rhs):
+					matches.add(lhs)
+			
+			return matches
 		
 		return None
+	
+	def get_precalculated_lhs(self) -> dict[str, str]:
+		"""
+		Returns the precalculated left-hand side symbols for the right-hand side productions.
+
+		Returns
+		-------
+		dict
+			Dictionary of precalculated left-hand side symbols for the right-hand side productions.
+		"""
+		return self.precalculated_lhs
 	
 	def get_rules(self) -> dict[str, set[str]]:
 		"""
