@@ -696,6 +696,19 @@ class CFG:
 		"""
 		return self.rules
 	
+	def get_probabilities(self) -> dict[str, dict[str, int|float]]:
+		"""
+		Returns the probabilities of the grammar if it is probabilistic.
+
+		Returns
+		-------
+		dict
+			Dictionary of probabilities in the form of {Symbol: {Production1: Prob(Production1), Production2: Prob(Production2), ...}, ...}.
+		"""
+		assert self.probabilistic, "The grammar is not probabilistic. No probabilities available."
+
+		return self.probabilities
+	
 	def set_rules(self, rules: dict[str, set[str]], start_symbol: str|None=None, probabilistic: bool=False) -> None:
 		"""
 		Sets the rules of the grammar.
