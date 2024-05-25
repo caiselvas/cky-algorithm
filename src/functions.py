@@ -1,3 +1,7 @@
+import matplotlib.pyplot as plt
+import networkx as nx
+
+
 def dynamic_round(value: int|float, threshold: int=3) -> int|float:
 	"""
 	Rounds a number when there is repeating 9s or 0s in the decimal part.
@@ -92,3 +96,82 @@ def dynamic_round(value: int|float, threshold: int=3) -> int|float:
 				return float(completed_str_value)
 			
 	return value
+
+def visualize_parse_trees(parse_trees_with_probs: list, prob: bool = True):
+    """
+    Visualizes the parse trees with their probabilities using networkx and matplotlib.
+
+    Parameters
+    ----------
+    parse_trees_with_probs : list
+        A list of tuples with parse trees and their probabilities.
+    filename : str
+        The name of the file to save the visualization. Default is 'parse_trees'.
+    prob : bool
+        Whether the parse trees are probabilistic. Default is True.
+    """
+    def add_nodes_edges(tree, graph: nx.DiGraph, parent: str = None, order: list = [0], layer: int = 0):
+        """
+        Recursively adds nodes and edges to the networkx DiGraph.
+
+        Parameters
+        ----------
+        tree : Any
+            The current subtree.
+        graph : nx.DiGraph
+            The networkx DiGraph object.
+        parent : str
+            The parent node identifier.
+        order : list
+            A list containing a single integer to keep track of the order of edges.
+        layer : int
+            The current layer of the node.
+        """
+        if isinstance(tree, tuple) and len(tree) == 3:
+            symbol, left, right = tree
+            node_id = f'{symbol}_{id(tree)}'
+            graph.add_node(node_id, label=symbol, layer=layer)
+            if parent:
+                order[0] += 1
+                graph.add_edge(parent, node_id, label=f'{order[0]}')
+            add_nodes_edges(left, graph, node_id, order, layer + 1)
+            add_nodes_edges(right, graph, node_id, order, layer + 1)
+        elif isinstance(tree, tuple) and len(tree) == 2:
+            symbol, terminal = tree
+            node_id = f'{symbol}_{id(tree)}'
+            graph.add_node(node_id, label=symbol, layer=layer)
+            if parent:
+                order[0] += 1
+                graph.add_edge(parent, node_id, label=f'{order[0]}')
+            terminal_id = f'{terminal}_{id(tree)}'
+            graph.add_node(terminal_id, label=terminal, layer=layer + 1)
+            graph.add_edge(node_id, terminal_id, label=f'{order[0]}')
+        else:
+            node_id = f'{tree}_{id(tree)}'
+            graph.add_node(node_id, label=str(tree), layer=layer)
+            if parent:
+                order[0] += 1
+                graph.add_edge(parent, node_id, label=f'{order[0]}')
+
+    for idx, item in enumerate(parse_trees_with_probs):
+        if prob:
+            tree, tree_prob = item
+        else:
+            tree, tree_prob = item, None
+        
+        graph = nx.DiGraph()
+        root_id = f'{tree[0]}_{id(tree)}'
+        graph.add_node(root_id, label=tree[0], layer=0)
+        add_nodes_edges(tree, graph, root_id, [0], 1)  # Reset order for each tree and start layer at 1
+
+        pos = nx.multipartite_layout(graph, subset_key='layer')  # Disposición jerárquica
+        labels = nx.get_node_attributes(graph, 'label')
+        edge_labels = nx.get_edge_attributes(graph, 'label')
+        plt.figure(figsize=(12, 8))
+        nx.draw(graph, pos, labels=labels, with_labels=True, node_size=3000, node_color='lightblue', font_size=10, font_weight='bold', arrows=True, arrowsize=20)
+        nx.draw_networkx_edge_labels(graph, pos, edge_labels=edge_labels, font_size=10, font_color='red')
+        if prob:
+            plt.title(f'Parse Tree {idx + 1} with Probability {tree_prob:.4f}')
+        else:
+            plt.title(f'Parse Tree {idx + 1}')
+        plt.show()
