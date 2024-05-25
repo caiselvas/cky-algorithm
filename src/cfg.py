@@ -674,7 +674,7 @@ class CFG:
 
 		Returns
 		-------
-		float
+		int|float
 			The probability of the production for the given symbol.
 		"""
 		return self.probabilities.get(lhs, {}).get(production, 0)
@@ -796,12 +796,13 @@ class CFG:
 			return [self.EPSILON] if self.is_terminal(self.EPSILON) else []
 
 		num_generated_words = 0
-		words = set()
-		if not self.probabilistic:
+		if self.probabilistic:
+			words_with_probabilities = {}
+		else:
 			visited = set()
-		words_with_probabilities = {}
+			words = set()
 		
-		# Queue of (current_string, current_word, current_probability), 
+		# Queue of (current_string, current_probability), 
 		# where current_string is the current string being processed,
 		# and current_probability is the probability of the word so far
 		queue = deque([(self.start_symbol, 1.0)]) 
@@ -816,13 +817,17 @@ class CFG:
 			# If current_string is fully expanded (all terminals), add to words
 			if all(self.is_terminal(sym) for sym in current_string):
 				if len(current_string) <= max_length:
-					words.add(current_string)
 					if self.probabilistic:
 						if current_string in words_with_probabilities:
-							words_with_probabilities[current_string] = max(words_with_probabilities[current_string], current_probability)
+							words_with_probabilities[current_string] += current_probability # Sum the probabilities of the same word (all different paths to the same word)
 						else:
 							words_with_probabilities[current_string] = current_probability
-					num_generated_words += 1
+							num_generated_words += 1
+					
+					else:
+						words.add(current_string)
+						num_generated_words += 1
+
 					print(f"Number of words generated: {num_generated_words}", end='\r')
 				continue
 
@@ -834,11 +839,14 @@ class CFG:
 						new_probability = current_probability * self.get_probability(sym, production) if self.probabilistic else 1.0
 						
 						if len(new_string) <= max_length:
-							if not self.probabilistic and new_string not in visited:
-								visited.add(new_string)
+							if self.probabilistic:
+								# No pruning for probabilistic grammars (because all the probabilities must be summed up)
 								queue.append((new_string, new_probability))
-							elif self.probabilistic and (new_string not in words_with_probabilities or new_probability > words_with_probabilities[new_string]):
-								queue.append((new_string, new_probability))
+							else:
+								# Prune the visited words
+								if new_string not in visited: 
+									visited.add(new_string)
+									queue.append((new_string, new_probability))
 					break  # Only expand the first nonterminal symbol, to avoid visiting the same word multiple times
 
 		print()
