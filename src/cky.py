@@ -2,7 +2,7 @@ from typing import Any
 from src.cfg import CFG
 from collections import defaultdict
 import warnings
-from functions import dynamic_round
+from src.functions import dynamic_round
 
 class CKY:
 	"""

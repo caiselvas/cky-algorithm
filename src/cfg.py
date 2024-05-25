@@ -1,8 +1,7 @@
 import warnings
 from itertools import combinations
 from collections import deque, defaultdict
-from functions import dynamic_round
-
+from src.functions import dynamic_round
 class CFG:
 	"""
 	A class to represent a Context-Free Grammar (CFG) or Probabilistic Context-Free Grammar (PCFG) in Chomsky Normal Form (CNF).
