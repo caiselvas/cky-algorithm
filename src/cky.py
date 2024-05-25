@@ -2,7 +2,7 @@ from typing import Any
 from src.cfg import CFG
 from collections import defaultdict
 import warnings
-from src.functions import dynamic_round
+from src.functions import dynamic_round, transform_probabilistic_to_deterministic, visualize_parse_trees
 
 class CKY:
 	"""
@@ -45,7 +45,7 @@ class CKY:
 		"""
 		self.grammar = grammar
 
-	def parse(self, word: str, grammar: CFG|None=None, round_probabilities: bool=False) -> tuple[bool, list]|tuple[bool, float, list]:
+	def parse(self, word: str, grammar: CFG|None=None, round_probabilities: bool=False, visualize: bool=False) -> tuple[bool, list]|tuple[bool, float, list]:
 		"""
 		Parses a given word using the CKY algorithm.
 
@@ -56,6 +56,7 @@ class CKY:
 		round_probabilities (bool): Whether to use dynamic rounding for the probabilities (with default theshold) or not. Default is False.
 			This helps fixing the floating point errors in the probabilities.
 			If the provided grammar is deterministic, this parameter is ignored.
+		visualize (bool): Whether to visualize the parse trees using the nltk library. Default is False.
 
 		Returns
 		-------
@@ -73,15 +74,15 @@ class CKY:
 		
 		if isinstance(grammar, CFG):
 			if grammar.is_probabilistic():
-				return self.__parse_probabilistic(word, grammar, round_probabilities) # Returns a tuple (bool, float, list)
+				return self.__parse_probabilistic(word, grammar, round_probabilities, visualize) # Returns a tuple (bool, float, list)
 			else:
 				if self.grammar is not None:
 					warnings.warn("Rounding probabilities is only available for probabilistic grammars. No rounding will be applied because the grammar is deterministic.", UserWarning)
-				return self.__parse_deterministic(word, grammar) # Returns a tuple (bool, list)
+				return self.__parse_deterministic(word, grammar, visualize) # Returns a tuple (bool, list)
 		else:
 			raise ValueError("Invalid grammar type. Expected CFG object.")
 
-	def __parse_deterministic(self, word: str, grammar: CFG) -> tuple[bool, list]:
+	def __parse_deterministic(self, word: str, grammar: CFG, visualize: bool) -> tuple[bool, list]:
 		"""
 		Parses a given word using the CKY algorithm deterministically.
 
@@ -152,10 +153,14 @@ class CKY:
 
 			parse_trees = build_trees(start_symbol, 0, n)
 
+		# Visualize the parse trees
+		if visualize:
+			visualize_parse_trees(parse_trees, prob=False)
+			
 		return result, parse_trees
 
 	
-	def __parse_probabilistic(self, word: str, grammar: CFG, round_probabilities) -> tuple[bool, float, list]:
+	def __parse_probabilistic(self, word: str, grammar: CFG, round_probabilities, visualize: bool) -> tuple[bool, float, list]:
 		"""
 		Parses a given word using the CKY algorithm probabilistically.
 
@@ -243,5 +248,9 @@ class CKY:
 			total_prob = dynamic_round(sum(prob for _, prob in parse_trees_with_probs))
 		else:
 			total_prob = sum(prob for _, prob in parse_trees_with_probs)
+		
+		# Visualize the parse trees
+		if visualize:
+			visualize_parse_trees(parse_trees_with_probs, prob=True)
 
 		return (total_prob > 0, total_prob, parse_trees_with_probs)
