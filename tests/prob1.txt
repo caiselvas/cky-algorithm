@@ -1,4 +1,14 @@
+PCFG
 S -> AB [0.9] | BC [0.1]
 A -> BA [0.5] | a [0.5]
 B -> CC [0.7] | b [0.3]
 C -> AB [0.6] | a [0.4]
+
+words to test:
+abab
+abba
+abaa
+a
+aa
+aaab
+aaa

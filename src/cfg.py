@@ -137,33 +137,38 @@ class CFG:
 		
 		for line in lines:
 			line = line.strip()
-			if not line.strip():
+			if not line:
 				continue
 			
-			if self.probabilistic is None and '->' in line:
-				raise ValueError("The type of the grammar ('CFG' or 'PCFG') must be specified in the first line of the file or text, before any rules.")
-			
-			if 'PCFG' in line:
-				self.probabilistic = True
-				continue
-			elif 'CFG' in line:
-				self.probabilistic = False
-			
-			lhs, rhs = line.split('->')
-			lhs = lhs.strip()
-			rhs = rhs.strip()
+			# Infer the type of the grammar
+			if self.probabilistic is None:
+				if '->' in line:
+					raise ValueError("The type of the grammar ('CFG' or 'PCFG') must be specified in the first line of the file or text, before any rules.")
+				
+				elif 'PCFG' in line:
+					self.probabilistic = True
+					continue
+				
+				elif 'CFG' in line:
+					self.probabilistic = False
 
-			if start_symbol is None:
-				start_symbol = lhs
-			
-			rhs = rhs.split('|')
-			rhs = {production.strip() for production in rhs}
+			# Read the rules
+			else:
+				lhs, rhs = line.split('->')
+				lhs = lhs.strip()
+				rhs = rhs.strip()
 
-			if self.probabilistic:
-				rhs = {tuple(production.split('[')) for production in rhs}
-				rhs = {(production.strip(), float(probability.strip(']').strip())) for production, probability in rhs}
+				if start_symbol is None:
+					start_symbol = lhs
+				
+				rhs = rhs.split('|')
+				rhs = {production.strip() for production in rhs}
 
-			rules[lhs] = rhs
+				if self.probabilistic:
+					rhs = {tuple(production.split('[')) for production in rhs}
+					rhs = {(production.strip(), float(probability.strip(']').strip())) for production, probability in rhs}
+
+				rules[lhs] = rhs
 
 		return rules
 
