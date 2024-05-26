@@ -155,7 +155,7 @@ class CKY:
 
 		# Visualize the parse trees
 		if visualize:
-			visualize_parse_trees(parse_trees, prob=False)
+			visualize_parse_trees(parse_trees, word=word, prob=False)
 			
 		return result, parse_trees
 
@@ -251,6 +251,6 @@ class CKY:
 		
 		# Visualize the parse trees
 		if visualize:
-			visualize_parse_trees(parse_trees_with_probs, prob=True)
+			visualize_parse_trees(parse_trees_with_probs, word=word, prob=True)
 
 		return (total_prob > 0, total_prob, parse_trees_with_probs)

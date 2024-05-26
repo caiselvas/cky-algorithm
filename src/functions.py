@@ -110,18 +110,21 @@ def transform_probabilistic_to_deterministic(parse_trees_with_probs) -> tuple[fl
 	tuple[float, list]
 		The total probability of the parse trees and the parse trees without probabilities as a list.
 	"""
+	# Calculate the sum of the final probabilities
 	total_prob = sum(prob for _, prob in parse_trees_with_probs)
 	
+	# Helper function to remove probabilities from nodes
 	def remove_probs(node):
 		if isinstance(node, tuple) and len(node) > 1:
 			return tuple(remove_probs(child) for child in node if not isinstance(child, float))
 		return node
-
+	
+	# Transform probabilistic parse trees to deterministic by removing probabilities
 	parse_trees_deterministic = [remove_probs(tree) for tree, _ in parse_trees_with_probs]
 	
 	return total_prob, parse_trees_deterministic
 
-def visualize_parse_trees(parse_trees_with_probs: list, prob: bool = True) -> None:
+def visualize_parse_trees(parse_trees_with_probs: list, word: str, prob: bool = True) -> None:
 	"""
 	Visualizes the parse trees with their probabilities using networkx and matplotlib.
 
@@ -204,9 +207,9 @@ def visualize_parse_trees(parse_trees_with_probs: list, prob: bool = True) -> No
 	nx.draw(graph, pos, labels=labels, with_labels=True, node_size=3000, node_color='lightblue', font_size=10, font_weight='bold', arrows=True, arrowsize=20)
 	nx.draw_networkx_edge_labels(graph, pos, edge_labels=edge_labels, font_size=10, font_color='red')
 	
-	title = 'Parse Trees'
+	title = f'Parse Trees for "{word}"'
 	if prob:
-		title = f'Parse Trees with Total Probability {total_prob:.4f}'
+		title = f'Parse Trees for "{word}" with Total Probability {total_prob:.4f}'
 	
 	plt.title(title)
 	plt.show()
