@@ -10,7 +10,7 @@ class CFG:
 	
 	EPSILON = 'ε'
 
-	def __init__(self, rules: dict[str, set[str]]|None=None, start_symbol: str|None=None, probabilistic: bool|None=None, from_file: str|None=None, from_text: str|None=None) -> None:
+	def __init__(self, rules: dict[str, set[str]|set[tuple[str, int|float]]]|None=None, start_symbol: str|None=None, probabilistic: bool|None=None, from_file: str|None=None, from_text: str|None=None) -> None:
 		"""
 		Initialize the CFG object with the provided rules.
 
@@ -46,6 +46,8 @@ class CFG:
 			"Please provide one (and only one) of the rules, the file path, or the text containing the rules of the grammar."
 		assert (probabilistic is not None) if (rules is not None) else True, \
 			"Please provide the type of the grammar with the parameter 'probabilistic' if the rules are provided directly."
+				
+		self.start_symbol = start_symbol
 		
 		if rules is not None:
 			self.probabilistic = probabilistic
@@ -62,9 +64,10 @@ class CFG:
 
 		self.improve_format()
 
-		self.terminals, self.nonterminals = self.find_symbols(start_symbol=start_symbol)
+		self.terminals, self.nonterminals = self.find_symbols(start_symbol=self.start_symbol)
 
-		self.start_symbol: str = start_symbol if start_symbol is not None else self.find_start_symbol()
+		if self.start_symbol is None:
+			self.start_symbol = self.find_start_symbol()
 
 		self.available_nonterminals = self.generate_available_nonterminals()
 
@@ -94,7 +97,7 @@ class CFG:
 		"""
 		return self.get_rhs(symbol)
 	
-	def read_rules_from_file_or_text(self, file_path: str|None=None, text: str|None=None) -> dict[str, set[str]] | dict[str, set[tuple[str, int|float]]]:
+	def read_rules_from_file_or_text(self, file_path: str|None=None, text: str|None=None) -> dict[str, set[str]|set[tuple[str, int|float]]]:
 		"""
 		Reads the grammar rules from a file or string and returns them in the correct format.
 
@@ -133,7 +136,6 @@ class CFG:
 			lines = text.split('\n')
 
 		rules = {}
-		start_symbol = None
 		
 		for line in lines:
 			line = line.strip()
@@ -158,8 +160,8 @@ class CFG:
 				lhs = lhs.strip()
 				rhs = rhs.strip()
 
-				if start_symbol is None:
-					start_symbol = lhs
+				if self.start_symbol is None:
+					self.start_symbol = lhs
 				
 				rhs = rhs.split('|')
 				rhs = {production.strip() for production in rhs}
@@ -850,7 +852,7 @@ class CFG:
 
 		return self.probabilities
 	
-	def set_rules(self, rules: dict[str, set[str]], start_symbol: str|None=None, probabilistic: bool=False, from_file: str|None=None) -> None:
+	def set_rules(self, rules: dict[str, set[str]|set[tuple[str, int|float]]], start_symbol: str|None=None, probabilistic: bool=False, from_file: str|None=None) -> None:
 		"""
 		Sets the rules of the grammar.
 
@@ -956,7 +958,7 @@ class CFG:
 
 		print()
 
-		if self.probabilistic and dynamic_round:
+		if self.probabilistic and round_probabilities:
 			for word in words_with_probabilities:
 				words_with_probabilities[word] = dynamic_round(words_with_probabilities[word])
 

@@ -1,0 +1,28 @@
+CFG(
+	S -> AB | BC
+	A -> BA | a
+	B -> CC | b
+	C -> AB | a
+)
+
+* Start Symbol: S
+* Terminal Symbols: {a, b}
+* Non-Terminal Symbols: {S, A, B, C}
+
+********************************************************************************
+
+aaab -> True
+TREE -> [('S', ('A', 'a'), ('B', ('C', 'a'), ('C', ('A', 'a'), ('B', 'b')))), ('S', ('B', ('C', 'a'), ('C', 'a')), ('C', ('A', 'a'), ('B', 'b'))), ('S', ('A', ('B', ('C', 'a'), ('C', 'a')), ('A', 'a')), ('B', 'b'))]
+
+aabb -> False
+
+bb -> False
+
+ab -> True
+TREE -> [('S', ('A', 'a'), ('B', 'b'))]
+
+aaa -> True
+TREE -> [('S', ('A', 'a'), ('B', ('C', 'a'), ('C', 'a'))), ('S', ('B', ('C', 'a'), ('C', 'a')), ('C', 'a'))]
+
+abab -> False
+

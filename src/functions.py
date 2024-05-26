@@ -214,24 +214,33 @@ def visualize_parse_trees(parse_trees_with_probs: list, word: str, prob: bool = 
 	plt.title(title)
 	plt.show()
 
-def split_input(file_path: str) -> tuple[str, list[str]]:
+def split_input(file_path: str|None=None, file_text: str|None=None) -> tuple[str, list[str]]:
 	"""
-	Splits the grammar text and the words to parse from a file.
+	Splits the grammar text and the words to parse from a file or a text.
 
 	Parameters
 	----------
-	file_path (str): The path to the file containing the grammar and the words to parse.
+	file_path (str, optional): The path to the file containing the grammar and the words to parse.
+	file_text (str, optional): The text containing the grammar and the words to parse.
 
 	Returns
 	-------
 	tuple[str, list[str]]
 		The grammar text and the words to parse.
 	"""
-	if not os.path.isfile(file_path):
-		raise FileNotFoundError(f"File '{file_path}' not found. Please provide a valid file path to get the grammar and the words to parse.")
+	assert (file_path is not None) or (file_text is not None), "Please provide a file path or a text to split the input."
+
+	# Read the file or split the text
+	if file_path is not None:	
+		if not os.path.isfile(file_path):
+			raise FileNotFoundError(f"File '{file_path}' not found. Please provide a valid file path to get the grammar and the words to parse.")
+		
+		lines = open(file_path, 'r').readlines()
 	
-	lines = open(file_path, 'r').readlines()
+	elif file_text is not None:
+		lines = file_text.split('\n')
 	
+	# Split the grammar and the words
 	rules_text, words_text = '', ''
 	rules_started, rules_ended = False, False
 
