@@ -10,7 +10,14 @@ class CFG:
 	
 	EPSILON = 'ε'
 
-	def __init__(self, rules: dict[str, set[str]|set[tuple[str, int|float]]]|None=None, start_symbol: str|None=None, probabilistic: bool|None=None, from_file: str|None=None, from_text: str|None=None) -> None:
+	def __init__(self, 
+		rules: dict[str, set[str]|set[tuple[str, int|float]]]|None=None, 
+		start_symbol: str|None=None, 
+		probabilistic: bool|None=None, 
+		from_file: str|None=None, 
+		from_text: str|None=None, 
+		from_words: set[str]|None=None
+		) -> None:
 		"""
 		Initialize the CFG object with the provided rules.
 
@@ -39,21 +46,34 @@ class CFG:
 			if the rules are read from a file or text, the type of the grammar is inferred from the file or text.
 		from_file (str, optional): The path to the file containing the grammar rules in string format.
 		from_text (str, optional): The grammar rules in string format.
+		from_words (set, optional): A set of words for which to generate the grammar rules.
 
 		Initializes the CKY parser with a given Context-Free Grammar (CFG).
 		"""
-		assert sum(arg is not None for arg in (rules, from_file, from_text)) == 1, \
+		assert sum(arg is not None for arg in (rules, from_file, from_text, from_words)) == 1, \
 			"Please provide one (and only one) of the rules, the file path, or the text containing the rules of the grammar."
 		assert (probabilistic is not None) if (rules is not None) else True, \
 			"Please provide the type of the grammar with the parameter 'probabilistic' if the rules are provided directly."
 				
 		self.start_symbol = start_symbol
-		
-		if rules is not None:
+
+		if rules is not None: # The only case where the probabilistic parameter is determined by the user
 			self.probabilistic = probabilistic
 
 		if (from_file is not None) or (from_text is not None):
 			rules = self.read_rules_from_file_or_text(file_path=from_file, text=from_text)
+
+		if from_words is not None:
+			self.terminals, self.nonterminals = set(), set()
+			self.available_nonterminals = self.generate_available_nonterminals()
+
+			if start_symbol is not None:
+				warnings.warn("The start symbol is ignored when generating the grammar from words.", UserWarning)
+			if probabilistic is True:
+				warnings.warn("The grammar is assumed to be deterministic when generating the grammar from words. Ignoring the probabilistic parameter.", UserWarning)
+
+			self.probabilistic = False
+			rules = self.generate_rules_from_words(words=from_words)
 
 		self.assert_valid_format(rules)
 
@@ -69,7 +89,8 @@ class CFG:
 		if self.start_symbol is None:
 			self.start_symbol = self.find_start_symbol()
 
-		self.available_nonterminals = self.generate_available_nonterminals()
+		if from_words is None: # In that case, the available nonterminals are already generated
+			self.available_nonterminals = self.generate_available_nonterminals()
 
 		print("\nInitial rules:", self, sep='\n')
 
@@ -96,6 +117,40 @@ class CFG:
 			List of productions for the given symbol.
 		"""
 		return self.get_rhs(symbol)
+	
+	def generate_rules_from_words(self, words: set[str]) -> dict[str, set[str]]:
+		"""
+		Generates the grammar rules that produce the given set of words.
+
+		Parameters
+		----------
+		words (set[str]): A set of words for which to generate the grammar.
+
+		Returns
+		-------
+		dict
+			A dictionary of rules in the form of {Symbol: {Production1, Production2, ...}, ...} for a deterministic CFG.
+		"""
+		assert all(isinstance(word, str) for word in words), "All words must be strings."
+		
+		# Lowercase the words
+		if any(c.isupper() for word in words for c in word):
+			warnings.warn("Some words contain uppercase characters. Converting all words to lowercase.", UserWarning)
+			words = {word.lower() for word in words}
+
+		self.start_symbol = self.create_nonterminal() # Start symbol is automatically added to nonterminals in create_nonterminal()
+		self.terminals = set(sym for word in words for sym in word)
+
+		rules = defaultdict(set)
+		for word in words:
+			production = ''
+			for sym in word:
+				nonterminal = self.get_or_create_nonterminal(rhs=sym, rules=rules)
+				production += nonterminal
+				rules[nonterminal] = {sym}
+			rules[self.start_symbol].add(production)
+
+		return dict(rules)
 	
 	def read_rules_from_file_or_text(self, file_path: str|None=None, text: str|None=None) -> dict[str, set[str]|set[tuple[str, int|float]]]:
 		"""
@@ -301,7 +356,8 @@ class CFG:
 			raise ValueError("The grammar is not correct. All terminal symbols must be lowercase or numbers.")
 
 		if start_symbol is not None:
-			if value := nonterminals - self.__get_reachable_nonterminals(start_symbol=start_symbol, nonterminals=nonterminals):
+			value = nonterminals - self.__get_reachable_nonterminals(start_symbol=start_symbol, nonterminals=nonterminals)
+			if value:
 				print("Not reachable:", value)
 				raise ValueError("The grammar is not correct. Some symbols produce other symbols but are not produced by any other symbol (cannot be reached).")
 
@@ -371,7 +427,7 @@ class CFG:
 		list
 			Sorted list of available nonterminal symbols (sorted in reverse order for easier access using pop() method).
 		"""
-		uppercase_abecedary = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		uppercase_abecedary = "SABCDEFGHIJKLMNOPQRTUVWXYZ"
 		other_greek_uppercase_letters = "ΓΔΘΛΞΠΣΦΨΩ"
 		
 		return list(sorted(set(uppercase_abecedary + other_greek_uppercase_letters) - self.nonterminals, reverse=True))
@@ -658,7 +714,7 @@ class CFG:
 		if isinstance(rhs, str):
 			rhs = {rhs}
 
-		existing_nt = self.get_lhs(produced_rhs=rhs, rules=rules)
+		existing_nt = self.get_lhs(produced_rhs=rhs, rules=rules, exact_match=True)
 		
 		if existing_nt is None:
 			new_nt = self.create_nonterminal()
