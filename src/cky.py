@@ -19,7 +19,7 @@ class CKY:
 		"""
 		self.grammar: CFG|None = grammar
 
-	def __call__(self, *args: Any, **kwargs: Any) -> bool | tuple[bool, float]:
+	def __call__(self, *args: Any, **kwargs: Any) -> tuple[bool, list]|tuple[bool, float, list]:
 		"""
 		Allows the CKY parser to be called as a function.
 
@@ -68,6 +68,9 @@ class CKY:
 			
 		"""
 		assert (grammar is not None) or (self.grammar is not None), "A grammar must be provided or set before parsing."
+		if any(c.isupper() for c in word):
+			warnings.warn("The word contains uppercase characters. Converting to lowercase.", UserWarning)
+			word = word.lower()
 
 		if grammar is None:
 			grammar = self.grammar
