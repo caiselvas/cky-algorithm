@@ -61,9 +61,10 @@ class CFG:
 
 		if from_dict is not None: # The only case where the probabilistic parameter is determined by the user
 			self.probabilistic = probabilistic
+			rules = from_dict.copy()
 
 		if (from_file is not None) or (from_text is not None):
-			from_dict = self.read_rules_from_file_or_text(file_path=from_file, text=from_text)
+			rules = self.read_rules_from_file_or_text(file_path=from_file, text=from_text)
 
 		if from_words is not None:
 			self.terminals, self.nonterminals = set(), set()
@@ -75,14 +76,14 @@ class CFG:
 				warnings.warn("The grammar is assumed to be deterministic when generating the grammar from words. Ignoring the probabilistic parameter.", UserWarning)
 
 			self.probabilistic = False
-			from_dict = self.generate_rules_from_words(words=from_words)
+			rules = self.generate_rules_from_words(words=from_words)
 
-		self.assert_valid_format(from_dict)
+		self.assert_valid_format(rules)
 
-		if not self.probabilistic:
-			self.rules: dict = from_dict.copy()
+		if self.probabilistic:
+			self.rules, self.probabilities = self.split_probabilities(rules)
 		else:
-			self.rules, self.probabilities = self.split_probabilities(from_dict)
+			self.rules = rules
 
 		self.improve_format()
 
@@ -276,7 +277,7 @@ class CFG:
 				if prob_sum != 1:
 					raise ValueError(f"The probabilities of the productions for each symbol must sum up to 1. For the symbol '{lhs}', the sum is {prob_sum}.")
 
-	def split_probabilities(self, full_rules: dict[str, set[str]]) -> tuple[dict[str, set[str]], dict[str, dict[str, int|float]]]:
+	def split_probabilities(self, full_rules: dict[str, set[tuple[str, int|float]]]) -> tuple[dict[str, set[str]], dict[str, dict[str, int|float]]]:
 		"""
 		Splits the full rules of the probabilistic CFG into rules and probabilities.
 
