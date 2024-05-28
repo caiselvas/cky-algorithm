@@ -476,15 +476,15 @@ class CFG:
 
 		More information: https://en.wikipedia.org/wiki/Chomsky_normal_form
 		"""
-		self.remove_start_symbol_from_rhs()
+		self.__remove_start_symbol_from_rhs()
 		# print("Removed start symbol from RHS:", self)
-		self.remove_productions_with_nonsolitary_terminals()
+		self.__remove_productions_with_nonsolitary_terminals()
 		# print("Removed rules with nonsolitary terminals:", self)
-		self.remove_long_nonterminal_productions()
+		self.__remove_long_nonterminal_productions()
 		# print("Removed rules with long nonterminals:", self)
-		self.remove_epsilon_productions()
+		self.__remove_epsilon_productions()
 		# print("Removed epsilon rules:", self)
-		self.remove_unit_productions()
+		self.__remove_unit_productions()
 		# print("Removed unit rules:", self)
 
 		self.assert_valid_format(self.rules)
@@ -497,7 +497,7 @@ class CFG:
 
 		assert self.is_cnf(), "The CFG could not be converted to CNF successfully."
 
-	def remove_start_symbol_from_rhs(self) -> None:
+	def __remove_start_symbol_from_rhs(self) -> None:
 		"""
 		Removes the start symbol from the right-hand side of the rules.
 		"""
@@ -509,7 +509,7 @@ class CFG:
 		
 		self.start_symbol = new_start_symbol
 		
-	def remove_productions_with_nonsolitary_terminals(self) -> None:
+	def __remove_productions_with_nonsolitary_terminals(self) -> None:
 		"""
 		Removes the productions that contain nonsolitary terminal symbols.
 		"""
@@ -543,7 +543,7 @@ class CFG:
 		self.rules = new_rules
 		self.nonterminals.update(new_nonterminals)
 
-	def remove_long_nonterminal_productions(self) -> None:
+	def __remove_long_nonterminal_productions(self) -> None:
 		"""
 		Removes the productions that contain more than two nonterminal symbols.
 		"""
@@ -574,7 +574,7 @@ class CFG:
 		self.rules = new_rules
 		self.nonterminals.update(new_nonterminals)
 
-	def remove_epsilon_productions(self) -> None:
+	def __remove_epsilon_productions(self) -> None:
 		"""
 		Removes the epsilon productions from the grammar.
 		"""
@@ -624,7 +624,7 @@ class CFG:
 						break
 		return nullable
 	
-	def remove_unit_productions(self) -> None:
+	def __remove_unit_productions(self) -> None:
 		"""
 		Removes the unit nonterminal productions from the grammar.
 		"""
