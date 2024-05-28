@@ -2,7 +2,9 @@ from typing import Any
 from src.cfg import CFG
 from collections import defaultdict
 import warnings
-from src.functions import dynamic_round, transform_probabilistic_to_deterministic, visualize_parse_trees
+from src.functions import dynamic_round
+import matplotlib.pyplot as plt
+import networkx as nx
 
 class CKY:
 	"""
@@ -158,7 +160,7 @@ class CKY:
 
 		# Visualize the parse trees
 		if visualize:
-			visualize_parse_trees(parse_trees, word=word, prob=False)
+			self.visualize_parse_trees(parse_trees, word=word, prob=False)
 			
 		return result, parse_trees
 
@@ -254,6 +256,125 @@ class CKY:
 		
 		# Visualize the parse trees
 		if visualize:
-			visualize_parse_trees(parse_trees_with_probs, word=word, prob=True)
+			self.visualize_parse_trees(parse_trees_with_probs, word=word, prob=True)
 
 		return (total_prob > 0, total_prob, parse_trees_with_probs)
+	
+
+	def __transform_probabilistic_to_deterministic(self, parse_trees_with_probs) -> tuple[float, list]:
+		"""
+		Transforms a list of parse trees with their probabilities to a list of parse trees without probabilities.
+
+		Parameters
+		----------
+		parse_trees_with_probs (list): A list of tuples with parse trees and their probabilities.
+
+		Returns
+		-------
+		tuple[float, list]
+			The total probability of the parse trees and the parse trees without probabilities as a list.
+		"""
+		# Calculate the sum of the final probabilities
+		total_prob = sum(prob for _, prob in parse_trees_with_probs)
+		
+		# Helper function to remove probabilities from nodes
+		def remove_probs(node):
+			if isinstance(node, tuple) and len(node) > 1:
+				return tuple(remove_probs(child) for child in node if not isinstance(child, float))
+			return node
+		
+		# Transform probabilistic parse trees to deterministic by removing probabilities
+		parse_trees_deterministic = [remove_probs(tree) for tree, _ in parse_trees_with_probs]
+		
+		return total_prob, parse_trees_deterministic
+	
+
+	def visualize_parse_trees(self, parse_trees_with_probs: list, word: str, prob: bool = True) -> None:
+		"""
+		Visualizes the parse trees with their probabilities using networkx and matplotlib.
+
+		Parameters
+		----------
+		parse_trees_with_probs (list): A list of tuples with parse trees and their probabilities.
+		prob (bool): Whether the parse trees are probabilistic. Default is True.
+		"""
+		def add_nodes_edges(tree, graph: nx.DiGraph, parent: str|None = None, order: list = [0], layer: int = 0, idx: int = 0):
+			"""
+			Recursively adds nodes and edges to the networkx DiGraph.
+
+			Parameters
+			----------
+			tree (Any): The current subtree.
+			graph (nx.DiGraph): The networkx DiGraph object.
+			parent (str, optional): The parent node identifier.
+			order (list): A list containing a single integer to keep track of the order of edges.
+			layer (int): The current layer of the node.
+			idx (int): The index of the current tree to ensure unique node identifiers.
+			"""
+			if isinstance(tree, tuple) and len(tree) == 3:
+				symbol, left, right = tree
+				node_id = f'{symbol}_{id(tree)}_{idx}'
+				graph.add_node(node_id, label=symbol, layer=layer)
+				
+				if parent:
+					order[0] += 1
+					graph.add_edge(parent, node_id, label=f'{order[0]}')
+				
+				add_nodes_edges(left, graph, node_id, order, layer + 1, idx)
+				add_nodes_edges(right, graph, node_id, order, layer + 1, idx)
+			
+			elif isinstance(tree, tuple) and len(tree) == 2:
+				symbol, terminal = tree
+				node_id = f'{symbol}_{id(tree)}_{idx}'
+				graph.add_node(node_id, label=symbol, layer=layer)
+				
+				if parent:
+					order[0] += 1
+					graph.add_edge(parent, node_id, label=f'{order[0]}')
+				
+				terminal_id = f'{terminal}_{id(tree)}_{idx}'
+				graph.add_node(terminal_id, label=terminal, layer=layer + 1)
+				graph.add_edge(node_id, terminal_id, label=f'{order[0]}')
+			
+			else:
+				node_id = f'{tree}_{id(tree)}_{idx}'
+				graph.add_node(node_id, label=str(tree), layer=layer)
+				
+				if parent:
+					order[0] += 1
+					graph.add_edge(parent, node_id, label=f'{order[0]}')
+
+		graph = nx.DiGraph()
+		pos = {}
+		y_offset = 0
+
+		total_prob = None
+		if prob:
+			total_prob, parse_trees_with_probs = self.__transform_probabilistic_to_deterministic(parse_trees_with_probs)
+		
+		for idx, item in enumerate(parse_trees_with_probs):
+			tree = item
+			root_id = f'{tree[0]}_{id(tree)}_{idx}'
+			root_label = tree[0]
+			graph.add_node(root_id, label=root_label, layer=0)
+
+			add_nodes_edges(tree, graph, root_id, [0], 1, idx)
+
+			subtree_pos = nx.multipartite_layout(graph, subset_key='layer')
+			subtree_pos = {k: (x, y + y_offset) for k, (x, y) in subtree_pos.items()}
+			pos.update(subtree_pos)
+			y_offset -= 3
+
+		labels = nx.get_node_attributes(graph, 'label')
+		edge_labels = nx.get_edge_attributes(graph, 'label')
+		
+		plt.figure(figsize=(20, 12))
+		nx.draw(graph, pos, labels=labels, with_labels=True, node_size=3000, node_color='lightblue', font_size=10, font_weight='bold', arrows=True, arrowsize=20)
+		nx.draw_networkx_edge_labels(graph, pos, edge_labels=edge_labels, font_size=10, font_color='red')
+		
+		title = f'Parse Trees for "{word}"'
+		if prob:
+			title = f'Parse Trees for "{word}" with Total Probability {total_prob:.4f}'
+		
+		plt.title(title)
+		plt.show()
