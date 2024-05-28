@@ -99,12 +99,10 @@ class CFG:
 
 		if self.probabilistic:
 			assert self.is_cnf(), "The provided PCFG is not in CNF. Please provide a PCFG in CNF."
-			self.precomputed_lhs = self.precompute_lhs()
 		else:
 			if not self.is_cnf():
 					warnings.warn("The provided CFG is not in CNF. Converting to CNF. Some productions and symbols may change.", UserWarning)
 					self.to_cnf()
-					self.precomputed_lhs = self.precompute_lhs()
 
 	def __call__(self, symbol: str) -> list:
 		"""
@@ -499,22 +497,6 @@ class CFG:
 
 		assert self.is_cnf(), "The CFG could not be converted to CNF successfully."
 
-	def precompute_lhs(self) -> dict[str, str]:
-		"""
-		Precomputes the left-hand side symbols for the right-hand side productions for faster access.
-
-		Returns
-		-------
-		dict
-			Dictionary of precomputed left-hand side symbols for the right-hand side productions.
-		"""
-		precomputed_lhs = defaultdict(set)
-		for lhs, rhs in self.rules.items():
-			for production in rhs:
-				precomputed_lhs[production].add(lhs)
-
-		return dict(precomputed_lhs)
-
 	def remove_start_symbol_from_rhs(self) -> None:
 		"""
 		Removes the start symbol from the right-hand side of the rules.
@@ -875,17 +857,6 @@ class CFG:
 			return matches
 		
 		return None
-	
-	def get_precomputed_lhs(self) -> dict[str, str]:
-		"""
-		Returns the precomputed left-hand side symbols for the right-hand side productions.
-
-		Returns
-		-------
-		dict
-			Dictionary of precalculated left-hand side symbols for the right-hand side productions.
-		"""
-		return self.precomputed_lhs
 	
 	def get_rules(self) -> dict[str, set[str]]:
 		"""
