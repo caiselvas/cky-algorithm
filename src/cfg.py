@@ -74,7 +74,7 @@ class CFG:
 			self.terminals, self.nonterminals = set(), set()
 			self.available_nonterminals = self.generate_available_nonterminals()
 
-			if start_symbol is not None:
+			if self.start_symbol is not None:
 				warnings.warn("The start symbol is ignored when generating the grammar from words.", UserWarning)
 			if probabilistic is True:
 				warnings.warn("The grammar is assumed to be deterministic when generating the grammar from words. Ignoring the probabilistic parameter.", UserWarning)
@@ -199,7 +199,7 @@ class CFG:
 		
 		for line in lines:
 			line = line.strip()
-			if not line:
+			if not line or line.startswith('#'):
 				continue
 			
 			# Infer the type of the grammar
@@ -312,7 +312,7 @@ class CFG:
 					self.rules[lhs].remove(production)
 					self.rules[lhs].add(str(production))
 				
-				# Replace empty strings with epsilon
+				# Replace empty strings with EMPTY
 				elif production == '':
 					self.rules[lhs].remove(production)
 					self.rules[lhs].add(self.EMPTY)
@@ -321,6 +321,39 @@ class CFG:
 				if len(production) >= 2 and self.EMPTY in production:
 					self.rules[lhs].remove(production)
 					self.rules[lhs].add(production.replace(self.EMPTY, ''))
+		
+		# Remove duplicated rhs (if multiple nonterminals produce the same rhs)
+		same_productions = defaultdict(set)
+		for lhs, rhs in self.rules.items():
+			produce_it = self.get_lhs(produced_rhs=rhs, rules=self.rules, exact_match=True, multiple_matches=True)
+			if isinstance(produce_it, set) and len(produce_it) > 1: # Multiple nonterminals produce the same rhs
+				same_productions[tuple(sorted(rhs))].update(produce_it)
+
+		while same_productions:
+			print(dict(same_productions))
+			productions, symbols = same_productions.popitem()
+			productions = set(productions)
+
+			if any(sym == self.start_symbol for sym in symbols):
+				main_production_symbol = self.start_symbol
+				symbols.remove(self.start_symbol)
+			else:
+				main_production_symbol = symbols.pop()
+
+			for symbol in symbols:
+				self.remove_rule(symbol)
+				self.nonterminals.remove(symbol)
+				self.available_nonterminals.append(symbol)
+
+				for lhs, rhs in self.rules.items():
+					new_rhs = set()
+					for production in rhs:
+						if symbol in production:
+							new_production = production.replace(symbol, main_production_symbol)
+							new_rhs.add(new_production)
+						else:
+							new_rhs.add(production)
+					self.rules[lhs] = new_rhs
 
 	def find_symbols(self, start_symbol: str|None) -> tuple[set, set]:
 		"""
@@ -492,6 +525,7 @@ class CFG:
 		# print("Removed unit rules:", self)
 
 		self.assert_valid_format(self.rules)
+		self.improve_format()
 
 		assert self.is_cnf(), "The CFG could not be converted to CNF successfully."
 
@@ -831,7 +865,7 @@ class CFG:
 		"""
 		return self.probabilities.get(lhs, {}).get(production, 0)
 	
-	def get_lhs(self, produced_rhs: set|str, rules: dict[str, set[str]]|None=None, exact_match: bool=True) -> None|str|set[str]:
+	def get_lhs(self, produced_rhs: set|str, rules: dict[str, set[str]]|None=None, exact_match: bool=True, multiple_matches: bool=False) -> None|str|set[str]:
 		"""
 		Returns the symbol exactly produces the given production.
 
@@ -840,6 +874,7 @@ class CFG:
 		produced_rhs (set|str): The production to find the symbol for. If it is a str, it is converted to a set(str).
 		rules (dict, optional): The rules of the grammar. If not provided, the rules of the current grammar are used.
 		exact_match (bool): Whether to find the exact match or the subset match. Default is True.
+		multiple_matches (bool): Whether to return multiple matches or the first match. Default is False.
 
 		Returns
 		-------
@@ -853,9 +888,17 @@ class CFG:
 		rules = rules if rules is not None else self.rules
 
 		if exact_match:
-			for lhs, rhs in rules.items():
-				if produced_rhs == rhs:
-					return lhs
+			if multiple_matches:
+				matches = set()
+				for lhs, rhs in rules.items():
+					if produced_rhs == rhs:
+						matches.add(lhs)
+				return matches
+			
+			else:
+				for lhs, rhs in rules.items():
+					if produced_rhs == rhs:
+						return lhs
 
 		else:
 			matches = set()
