@@ -10,7 +10,7 @@ class CFG:
 	A class to represent a Context-Free Grammar (CFG) or Probabilistic Context-Free Grammar (PCFG) in Chomsky Normal Form (CNF).
 	"""
 	
-	EPSILON = 'ε'
+	EPSILON = 'ε' # Commonly used values: 'ε', 'λ', 'ϵ'
 
 	def __init__(self, 
 		from_dict: dict[str, set[str]|set[tuple[str, int|float]]]|None=None, 
