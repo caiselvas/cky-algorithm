@@ -16,13 +16,15 @@ def dynamic_round(value: int|float, threshold: int=3) -> int|float:
 
 	Examples
 	--------
-	>>> custom_round(3.14159, 3)
+	>>> dynamic_round(3.14159, 3)
 	3.14159
-	>>> custom_round(0.0005163749999999999, 3)
+	>>> dynamic_round(0.0005163749999999999, 3)
 	0.000516375
-	>>> custom_round(2.2680000000000003e-05, 3)
+	>>> dynamic_round(2.2680000000000003e-05, 3)
 	2.268e-05
 	"""
+	assert threshold >= 1, "The threshold must be greater than or equal to 1."
+
 	str_value = str(value)
 	if '.' in str_value:
 		int_part, dec_part = str_value.split('.')
@@ -128,7 +130,7 @@ def split_input(file_path: str|None=None, file_text: str|None=None) -> tuple[str
 
 	for line in lines:
 		line = line.strip()
-		if not line:
+		if not line or line.startswith('#'): # Skip empty lines and comments
 			continue
 
 		if (not rules_ended) and ((not rules_started) or ('->' in line)):
