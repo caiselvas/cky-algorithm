@@ -31,7 +31,7 @@ save_path = f'./results/results_{'prob' if cfg.is_probabilistic() else 'det'}.tx
 save_file = open(save_path, 'w')
 
 save_file.write(f"{cfg}\n")
-save_file.write(f"{'*' * 80}\n\n")
+save_file.write(f"{'#' * 50}\n\n")
 
 # Write the results to the file
 for result, word in zip(results, words):
