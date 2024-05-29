@@ -488,24 +488,17 @@ class CFG:
 		# print("Removed unit rules:", self)
 
 		self.assert_valid_format(self.rules)
-		
-		# Update the symbols and start symbol
-		self.terminals, self.nonterminals = self.find_symbols(start_symbol=self.start_symbol)
-		self.start_symbol = self.find_start_symbol()
-
-		print("Converted CFG to CNF:", self, sep='\n')
 
 		assert self.is_cnf(), "The CFG could not be converted to CNF successfully."
+
+		print("Converted CFG to CNF:", self, sep='\n')
 
 	def __remove_start_symbol_from_rhs(self) -> None:
 		"""
 		Removes the start symbol from the right-hand side of the rules.
 		"""
-		self.original_start_symbol = self.start_symbol
-
 		new_start_symbol = self.create_nonterminal()
 		self.rules[new_start_symbol] = {self.start_symbol}
-		self.nonterminals.add(new_start_symbol)
 		
 		self.start_symbol = new_start_symbol
 		
@@ -578,22 +571,26 @@ class CFG:
 		"""
 		Removes the epsilon productions from the grammar.
 		"""
+		# Step 1: Find all nullable nonterminals
 		nullable = self.get_nullable_nonterminals()
 
+		# Step 2: Replace by all possible combinations of including or excluding nullable nonterminals
 		new_rules = defaultdict(set)
 		for lhs, rhs in self.rules.items():
 			for production in rhs:
-				if production != self.EPSILON:
-					new_rules[lhs].add(production)
-					indices = [i for i, sym in enumerate(production) if sym in nullable]
-					for n in range(1, len(indices) + 1):
-						for comb in combinations(indices, n):
-							new_production = ''.join(sym for i, sym in enumerate(production) if i not in comb)
-							if new_production == '':
-								new_production = self.EPSILON
-							new_rules[lhs].add(new_production)
-				elif lhs == self.start_symbol:
-					new_rules[lhs].add(self.EPSILON)
+				new_rules[lhs].add(production)
+				indices = [i for i, sym in enumerate(production) if sym in nullable]
+				for n in range(1, len(indices) + 1):
+					for ignored_indices_comb in combinations(indices, n):
+						new_production = ''.join(sym for i, sym in enumerate(production) if i not in ignored_indices_comb)
+						if new_production == '': # All indices are ignored
+							new_production = self.EPSILON
+						new_rules[lhs].add(new_production)
+
+		# Step 3: Remove all epsilon productions (except for the start symbol)
+		for lhs, rhs in new_rules.items():
+			if lhs != self.start_symbol and self.EPSILON in rhs:
+				new_rules[lhs].remove(self.EPSILON)
 
 		self.rules = dict(new_rules)
 
@@ -628,49 +625,57 @@ class CFG:
 		"""
 		Removes the unit nonterminal productions from the grammar.
 		"""
-		unit_pairs = set()  # Set of (A, B) pairs where A -> B is a unit production
+		# Step 1: Find all unit pairs
+		unit_pairs = self.__find_unit_pairs()
+
+		# Step 2: Find the transitive closure of the unit pairs
+		closure = unit_pairs.copy()
+		while True:
+			new_pairs = set((A, D) for (A, B) in closure for (C, D) in closure if B == C)
+			if new_pairs.issubset(closure): # Break if no new pairs are found
+				break
+			closure.update(new_pairs)
+
+		# Step 3: Add new productions for each unit pair
+		new_rules = defaultdict(set)
+		for lhs, rhs in self.rules.items():
+			for production in rhs:
+				if len(production) != 1 or not self.is_nonterminal(production[0]):
+					new_rules[lhs].add(production)
 		
-		# Find all unit pairs
+		for A, B in closure:
+			if A != B:
+				for production in self.rules[B]:
+					if len(production) != 1 or not self.is_nonterminal(production):
+						new_rules[A].add(production)
+
+		self.rules = dict(new_rules)
+		
+		# Step 4: Remove unreachable nonterminals
+		unreachable = self.nonterminals - self.__get_reachable_nonterminals(start_symbol=self.start_symbol, nonterminals=self.nonterminals)
+		for nonterminal in unreachable:
+			self.remove_rule(nonterminal)
+			self.nonterminals.remove(nonterminal)
+			self.available_nonterminals.append(nonterminal)
+
+	def __find_unit_pairs(self) -> set:
+		"""
+		Finds all unit pairs in the grammar.
+
+		A unit pair is a pair of nonterminal symbols (A, B) where A -> B is a unit production (and A, B are nonterminals).
+
+		Returns
+		-------
+		set
+			Set of unit pairs (A, B) where A -> B is a unit production.
+		"""
+		unit_pairs = set()
 		for lhs, rhs in self.rules.items():
 			for production in rhs:
 				if len(production) == 1 and self.is_nonterminal(production):
 					unit_pairs.add((lhs, production))
 
-		# Find the transitive closure of the unit pairs
-		while True:
-			new_pairs = set()
-			for (A, B) in unit_pairs:
-				for (C, D) in unit_pairs:
-					if B == C:
-						new_pairs.add((A, D))
-			if new_pairs.issubset(unit_pairs):
-				break
-			unit_pairs.update(new_pairs)
-
-		# Add new productions for each unit pair
-		new_rules = defaultdict(set)
-		for lhs, rhs in self.rules.items():
-			for production in rhs:
-				if len(production) != 1 or not self.is_nonterminal(production):
-					new_rules[lhs].add(production)
-		for (A, B) in unit_pairs:
-			if A != B:
-				for production in self.rules.get(B, set()):
-					if len(production) != 1 or not self.is_nonterminal(production):
-						new_rules[A].add(production)
-
-		self.rules = dict(new_rules)
-
-		# Remove nonterminals that are not produced anywhere
-		produced_symbols = set()
-		for rhs in self.rules.values():
-			for production in rhs:
-				for sym in production:
-					produced_symbols.add(sym)
-		unused_nonterminals = self.nonterminals - produced_symbols - {self.start_symbol}
-		for nonterminal in unused_nonterminals:
-			self.remove_rule(nonterminal)
-		self.nonterminals -= unused_nonterminals
+		return unit_pairs
 
 	def create_nonterminal(self) -> str:
 		"""
