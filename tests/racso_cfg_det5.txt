@@ -1,0 +1,6 @@
+# Exercise 5: Non-ambiguous CFG for {a^i b^j | 2i ≤ j}
+# Write a non-ambiguous CFG generating the words of the form a^i b^j where the number of b's is at least twice the number of a's.
+
+CFG
+S -> aSbb | B
+B -> Bb | ϵ

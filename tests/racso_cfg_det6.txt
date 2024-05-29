@@ -1,0 +1,5 @@
+# Exercise 6: CFG for {a^i b^j | 2i ≥ j}
+# Write a CFG generating the words of the form a^i b^j where the number of b's is at most twice the number of a's.
+
+CFG
+S -> aSbb | aSb | aS | ϵ

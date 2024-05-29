@@ -1,0 +1,13 @@
+# Exercise 45: CFG for {a^n b^m c^k d^t | n = m ∨ n = k ∨ n = t}
+# Write a CFG (which will be ambiguous) generating the words of the form a^n b^m c^k d^t where the amount of a's equals the amount of b's or the amount of c's or the amount of d's.
+
+CFG
+S -> M | K | T
+M -> PCD
+P -> aPb | ϵ
+K -> QD
+Q -> aQc | B
+T -> aTd | BC
+C -> cC | ϵ
+B -> bB | ϵ
+D -> dD | ϵ

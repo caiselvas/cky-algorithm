@@ -1,0 +1,6 @@
+
+# Exercise 1: Non-ambiguous CFG for {a^n b^n | n ≥ 0}
+# Write a non-ambiguous CFG generating the language over {a, b} where the first half of each word only contains a's and the second half only contains b's.
+
+CFG
+S -> aSb | ϵ

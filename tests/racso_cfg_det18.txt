@@ -1,0 +1,8 @@
+# Exercise 18: Non-ambiguous CFG for {w ∈ {a, b}* | w = w^R ∧ |w|a > 0 ∧ |w|b > 0}
+# Write a non-ambiguous CFG generating the palindromic words over {a, b} with some occurrence of a and some occurrence of b.
+
+CFG
+S -> aAa | bBb
+A -> aAa | bPb | b
+B -> bBb | aPa | a
+P -> aPa | bPb | a | b | ϵ

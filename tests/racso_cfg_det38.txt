@@ -1,0 +1,9 @@
+# Exercise 38: CFG for the complement of {a^n b^n | n ≥ 0}
+# Write a CFG generating the language of words over {a, b} that are not of the form a^n b^n, where n ≥ 0.
+
+CFG
+S -> XbaX | Y
+X -> aX | bX | ϵ
+Y -> aYb | A | B
+A -> aA | a
+B -> bB | b

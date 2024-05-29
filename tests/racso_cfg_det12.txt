@@ -1,0 +1,13 @@
+# Exercise 12: CFG for {a^i b^j c^k | i = j ∨ j = k ∨ i = k}
+# Write a CFG (which will be ambiguous) generating the words of the form a^i b^j c^k where the number of a's equals the number of b's, or the number of b's equals the number of c's, or the number of c's equals the number of a's.
+
+CFG
+S -> H | F | Z
+H -> XC
+F -> AY
+Z -> aZc | B
+A -> Aa | ϵ
+B -> Bb | ϵ
+C -> Cc | ϵ
+X -> aXb | ϵ
+Y -> bYc | ϵ

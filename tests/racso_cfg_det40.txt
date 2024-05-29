@@ -1,0 +1,6 @@
+# Exercise 40: Non-ambiguous CFG for the complement of {w ∈ {a, b}* | w = w^R}
+# Write a non-ambiguous CFG generating the language of words over {a, b} that are not palindromic.
+
+CFG
+S -> aXb | bXa | aSa | bSb
+X -> aX | bX | ϵ

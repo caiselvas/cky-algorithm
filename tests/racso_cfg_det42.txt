@@ -1,0 +1,11 @@
+# Exercise 42: CFG for the complement of {wcw | w ∈ {a, b}*}
+# Write a CFG (which will be ambiguous) generating the language of words over {a, b, c} that are not of the form wcw, where w is a word over {a, b}.
+
+CFG
+S -> XcXcX | N | P | Q
+X -> aX | bX | cX | ϵ
+N -> aN | bN | ϵ
+P -> aXc | bXc | cXa | cXb | aPa | bPb | aPb | bPa
+Q -> RbX | TaX
+R -> aRa | aRb | bRa | bRb | aXc | ϵ
+T -> aTa | aTb | bTa | bTb | bXc | ϵ

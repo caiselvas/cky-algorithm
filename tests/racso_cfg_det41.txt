@@ -1,0 +1,11 @@
+# Exercise 41: CFG for the complement of {a^n b^n c^n | n ≥ 0}
+# Write a CFG (which will be ambiguous) generating the language of the words over {a, b, c} that are not of the form a^n b^n c^n, where n ≥ 0.
+
+CFG
+S -> XbaX | XcaX | XcbX | N | P | C
+X -> aX | bX | cX | ϵ
+N -> aNc | aXb | bXc | A | cC
+P -> aPb | A | B
+A -> aA | a | ϵ
+B -> bB | b | ϵ
+C -> cC | c | ϵ
