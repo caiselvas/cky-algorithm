@@ -1,0 +1,17 @@
+CFG(
+	A -> DB | EC | FB | GC
+	B -> b
+	C -> a
+	D -> CX | a
+	E -> BX | b
+	F -> BA
+	G -> CA
+	X -> BX | CX | a | b
+)
+
+* Start Symbol: A
+* Terminal Symbols: {a, b, ϵ}
+* Non-Terminal Symbols: {A, B, C, D, E, F, G, X}
+
+##################################################
+

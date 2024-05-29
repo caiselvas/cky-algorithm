@@ -1,0 +1,19 @@
+CFG(
+	C -> DA | DZ | EB | ET | FE | a | b
+	A -> DA | a
+	B -> EB | b
+	D -> a
+	E -> b
+	F -> DY
+	T -> DX | ET | a
+	X -> DX | EX | a | b
+	Y -> DA | EB | FE | a | b
+	Z -> DZ | ET
+)
+
+* Start Symbol: C
+* Terminal Symbols: {a, b, ϵ}
+* Non-Terminal Symbols: {C, A, B, D, E, F, T, X, Y, Z}
+
+##################################################
+

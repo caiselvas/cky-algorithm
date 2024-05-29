@@ -4,3 +4,27 @@
 CFG
 S -> aKb
 K -> aKb | c
+
+# True (10)
+acb
+aacbb
+aaacbbb
+aaaacbbbb
+aaaaacbbbbb
+aaaaaacbbbbbb
+aaaaaaacbbbbbbb
+aaaaaaaacbbbbbbbb
+aaaaaaaaacbbbbbbbbb
+aaaaaaaaaacbbbbbbbbbb
+
+# False (10)
+ϵ
+c
+ac
+aa
+acbb
+aacbbb
+ccccab
+acccccb
+ccccac
+acbacb

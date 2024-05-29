@@ -1,0 +1,54 @@
+CFG(
+	A -> BD | FD | b | ϵ
+	B -> BD | b
+	C -> a
+	D -> b
+	E -> CS | a
+	F -> ED
+	S -> BD | FD | b
+)
+
+* Start Symbol: A
+* Terminal Symbols: {a, b, ϵ}
+* Non-Terminal Symbols: {A, B, C, D, E, F, S}
+
+##################################################
+
+ϵ -> True
+TREE -> [('A', 'ϵ')]
+
+b -> True
+TREE -> [('A', 'b')]
+
+bb -> True
+TREE -> [('A', ('B', 'b'), ('D', 'b'))]
+
+abb -> True
+TREE -> [('A', ('F', ('E', 'a'), ('D', 'b')), ('D', 'b'))]
+
+aabbbb -> True
+TREE -> [('A', ('F', ('E', ('C', 'a'), ('S', ('F', ('E', 'a'), ('D', 'b')), ('D', 'b'))), ('D', 'b')), ('D', 'b'))]
+
+aaabbbbb -> False
+
+aaaabbbbbb -> False
+
+bbbbbbbbbbb -> True
+TREE -> [('A', ('B', ('B', ('B', ('B', ('B', ('B', ('B', ('B', ('B', ('B', 'b'), ('D', 'b')), ('D', 'b')), ('D', 'b')), ('D', 'b')), ('D', 'b')), ('D', 'b')), ('D', 'b')), ('D', 'b')), ('D', 'b')), ('D', 'b'))]
+
+a -> False
+
+bba -> False
+
+aaab -> False
+
+abab -> False
+
+aaaaa -> False
+
+c -> False
+
+aaabb -> False
+
+aaaaabbbb -> False
+

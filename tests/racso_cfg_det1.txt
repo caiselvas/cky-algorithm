@@ -3,4 +3,27 @@
 # Write a non-ambiguous CFG generating the language over {a, b} where the first half of each word only contains a's and the second half only contains b's.
 
 CFG
-S -> aSb | ϵ
+S -> aSb | 
+
+# True (10)
+
+ab
+aabb
+aaabbb
+aaaabbbb
+aaaaabbbbb
+aaaaaabbbbbb
+aaaaaaabbbbbbb
+aaaaaaaabbbbbbbb
+
+# False (10)
+a
+b
+abab
+abba
+ababab
+aaaaaa
+bbbbba
+ba
+baab
+baaabbb

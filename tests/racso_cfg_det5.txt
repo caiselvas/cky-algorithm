@@ -4,3 +4,23 @@
 CFG
 S -> aSbb | B
 B -> Bb | ϵ
+
+# True (8)
+ϵ
+b
+bb
+abb
+aabbbb
+aaabbbbb
+aaaabbbbbb
+bbbbbbbbbbb
+
+# False (8)
+a
+bba
+aaab
+abab
+aaaaa
+c
+aaabb
+aaaaabbbb

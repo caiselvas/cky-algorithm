@@ -1,0 +1,22 @@
+CFG(
+	D -> AE | AY | BI | CG | JG | KI | LG | XC | a | b | c | ϵ
+	A -> AE | a
+	B -> BI | b
+	C -> CG | c
+	E -> a
+	G -> c
+	I -> b
+	J -> EZ | a
+	K -> EX | a
+	L -> IY | b
+	X -> KI
+	Y -> LG
+	Z -> BI | JG | b
+)
+
+* Start Symbol: D
+* Terminal Symbols: {a, b, c, ϵ}
+* Non-Terminal Symbols: {D, A, B, C, E, G, I, J, K, L, X, Y, Z}
+
+##################################################
+

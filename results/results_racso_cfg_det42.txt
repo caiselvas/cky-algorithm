@@ -1,0 +1,32 @@
+CFG(
+	A -> CN | DN | FB | GX | HB | IC | ID | JC | JD | KC | KD | LB | MX | OX | RD | TC | a | b | ϵ
+	B -> c
+	C -> a
+	D -> b
+	E -> XB | c
+	F -> EX | XB | c
+	G -> FB
+	H -> CX | a
+	I -> CP
+	J -> BX | c
+	K -> DP
+	L -> DX | b
+	M -> TC | a
+	N -> CN | DN | a | b
+	O -> RD | b
+	P -> HB | IC | ID | JC | JD | KC | KD | LB
+	R -> HB | UC | UD | VC | VD
+	T -> LB | WC | WD | YC | YD
+	U -> CR | a
+	V -> DR | b
+	W -> CT | a
+	X -> BX | CX | DX | a | b | c
+	Y -> DT | b
+)
+
+* Start Symbol: A
+* Terminal Symbols: {a, b, c, ϵ}
+* Non-Terminal Symbols: {A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, R, T, U, V, W, X, Y}
+
+##################################################
+

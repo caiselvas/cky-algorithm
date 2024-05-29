@@ -1,0 +1,58 @@
+CFG(
+	A -> DC | ϵ
+	B -> a
+	C -> b
+	D -> BS | a
+	S -> DC
+)
+
+* Start Symbol: A
+* Terminal Symbols: {a, b, ϵ}
+* Non-Terminal Symbols: {A, B, C, D, S}
+
+##################################################
+
+ab -> True
+TREE -> [('A', ('D', 'a'), ('C', 'b'))]
+
+aabb -> True
+TREE -> [('A', ('D', ('B', 'a'), ('S', ('D', 'a'), ('C', 'b'))), ('C', 'b'))]
+
+aaabbb -> True
+TREE -> [('A', ('D', ('B', 'a'), ('S', ('D', ('B', 'a'), ('S', ('D', 'a'), ('C', 'b'))), ('C', 'b'))), ('C', 'b'))]
+
+aaaabbbb -> True
+TREE -> [('A', ('D', ('B', 'a'), ('S', ('D', ('B', 'a'), ('S', ('D', ('B', 'a'), ('S', ('D', 'a'), ('C', 'b'))), ('C', 'b'))), ('C', 'b'))), ('C', 'b'))]
+
+aaaaabbbbb -> True
+TREE -> [('A', ('D', ('B', 'a'), ('S', ('D', ('B', 'a'), ('S', ('D', ('B', 'a'), ('S', ('D', ('B', 'a'), ('S', ('D', 'a'), ('C', 'b'))), ('C', 'b'))), ('C', 'b'))), ('C', 'b'))), ('C', 'b'))]
+
+aaaaaabbbbbb -> True
+TREE -> [('A', ('D', ('B', 'a'), ('S', ('D', ('B', 'a'), ('S', ('D', ('B', 'a'), ('S', ('D', ('B', 'a'), ('S', ('D', ('B', 'a'), ('S', ('D', 'a'), ('C', 'b'))), ('C', 'b'))), ('C', 'b'))), ('C', 'b'))), ('C', 'b'))), ('C', 'b'))]
+
+aaaaaaabbbbbbb -> True
+TREE -> [('A', ('D', ('B', 'a'), ('S', ('D', ('B', 'a'), ('S', ('D', ('B', 'a'), ('S', ('D', ('B', 'a'), ('S', ('D', ('B', 'a'), ('S', ('D', ('B', 'a'), ('S', ('D', 'a'), ('C', 'b'))), ('C', 'b'))), ('C', 'b'))), ('C', 'b'))), ('C', 'b'))), ('C', 'b'))), ('C', 'b'))]
+
+aaaaaaaabbbbbbbb -> True
+TREE -> [('A', ('D', ('B', 'a'), ('S', ('D', ('B', 'a'), ('S', ('D', ('B', 'a'), ('S', ('D', ('B', 'a'), ('S', ('D', ('B', 'a'), ('S', ('D', ('B', 'a'), ('S', ('D', ('B', 'a'), ('S', ('D', 'a'), ('C', 'b'))), ('C', 'b'))), ('C', 'b'))), ('C', 'b'))), ('C', 'b'))), ('C', 'b'))), ('C', 'b'))), ('C', 'b'))]
+
+a -> False
+
+b -> False
+
+abab -> False
+
+abba -> False
+
+ababab -> False
+
+aaaaaa -> False
+
+bbbbba -> False
+
+ba -> False
+
+baab -> False
+
+baaabbb -> False
+

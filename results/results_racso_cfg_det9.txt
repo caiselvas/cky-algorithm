@@ -1,7 +1,7 @@
 CFG(
-	C -> BD | EA | FD
-	A -> EA | ϵ
-	B -> BD | ϵ
+	C -> BD | EA | FD | a | b
+	A -> EA | a
+	B -> BD | b
 	D -> b
 	E -> a
 	F -> EC

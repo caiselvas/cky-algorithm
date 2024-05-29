@@ -119,7 +119,7 @@ def split_input(file_path: str|None=None, file_text: str|None=None) -> tuple[str
 		if not os.path.isfile(file_path):
 			raise FileNotFoundError(f"File '{file_path}' not found. Please provide a valid file path to get the grammar and the words to parse.")
 		
-		lines = open(file_path, 'r').readlines()
+		lines = open(file_path, 'r', encoding="utf-8").readlines()
 	
 	elif file_text is not None:
 		lines = file_text.split('\n')

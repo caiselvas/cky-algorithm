@@ -1,0 +1,23 @@
+CFG(
+	L -> IM | JN | MA | NL | c
+	A -> IM | JN | MA | NB | c
+	B -> IM | JN | MC | NL | c
+	C -> CM | DN
+	D -> DN | EM
+	E -> CM | FN
+	F -> JN | KM | MF | NG | c
+	G -> JN | KM | MD | NH | c
+	H -> JN | KM | MF | NH | c
+	I -> IM | JN | c
+	J -> JN | KM | c
+	K -> IM | c
+	M -> a
+	N -> b
+)
+
+* Start Symbol: L
+* Terminal Symbols: {a, b, c}
+* Non-Terminal Symbols: {L, A, B, C, D, E, F, G, H, I, J, K, M, N}
+
+##################################################
+
