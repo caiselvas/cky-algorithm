@@ -107,7 +107,7 @@ class CKY:
 		start_symbol = grammar.get_start_symbol()
 
 		if n == 0:
-			return (grammar.EPSILON in grammar(start_symbol), [])
+			return (grammar.EMPTY in grammar(start_symbol), [])
 
 		# Create a triangular table where table[i] has size (n-i)
 		table = [ [set() for _ in range(n - i)] for i in range(n) ]
@@ -187,8 +187,8 @@ class CKY:
 		start_symbol = grammar.get_start_symbol()
 
 		if n == 0:
-			if grammar.EPSILON in grammar(start_symbol):
-				return (True, grammar.get_probability(start_symbol, grammar.EPSILON), [(grammar.EPSILON, grammar.get_probability(start_symbol, grammar.EPSILON))])
+			if grammar.EMPTY in grammar(start_symbol):
+				return (True, grammar.get_probability(start_symbol, grammar.EMPTY), [(grammar.EMPTY, grammar.get_probability(start_symbol, grammar.EMPTY))])
 			else:
 				return (False, 0.0, [])
 
