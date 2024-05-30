@@ -79,11 +79,11 @@ class CKY:
 		
 		if isinstance(grammar, CFG):
 			if grammar.is_probabilistic():
-				return self.__parse_probabilistic(word, grammar, round_probabilities, visualize) # Returns a tuple (bool, float, list)
+				return self.__parse_probabilistic(word=word, grammar=grammar, round_probabilities=round_probabilities, visualize=visualize) # Returns a tuple (bool, float, list)
 			else:
-				if self.grammar is not None:
+				if round_probabilities:
 					warnings.warn("Rounding probabilities is only available for probabilistic grammars. No rounding will be applied because the grammar is deterministic.", UserWarning)
-				return self.__parse_deterministic(word, grammar, visualize) # Returns a tuple (bool, list)
+				return self.__parse_deterministic(word=word, grammar=grammar, visualize=visualize) # Returns a tuple (bool, list)
 		else:
 			raise ValueError("Invalid grammar type. Expected CFG object.")
 

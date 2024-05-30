@@ -20,7 +20,10 @@ def main(input_text: str, file_name: str) -> None:
 
 	results = []
 	for word in words:
-		result = cky.parse(word=word, round_probabilities=True)
+		if cfg.is_probabilistic():
+			result = cky.parse(word=word, round_probabilities=True)
+		else:
+			result = cky.parse(word=word)
 		results.append(result)
 
 	# Save the results to a file
@@ -57,7 +60,7 @@ if __name__ == '__main__':
 	all_files = False
 	first_n_files = None
 	while True:
-		file_name = input("Input file: ")
+		file_name = input("Input file [file name | all | help]: ")
 		if not file_name:
 			print("Please provide a valid file name.")
 			continue
@@ -79,7 +82,10 @@ if __name__ == '__main__':
 
 	# Get the list of files to process
 	files_list = os.listdir('./tests') if all_files else [file_name]
+	total_files = len(files_list)
 
+	# Process the files
+	errors = 0
 	for file_name in files_list:
 		print(f"\n{'#'*25} RUNNING FILE '{file_name}' {'#'*25}")
 
@@ -92,6 +98,7 @@ if __name__ == '__main__':
 				main(input_text=input_text, file_name=file_name)
 			except Exception as e:
 				print(f"Error processing file '{file_name}'. Error message: {e}.\n\nIgnoring file and continuing to the next one.")
+				errors += 1
 				continue
 
-	print("\nAll files processed successfully!")
+	print(f"\n{'#'*25} ALL {total_files} FILES PROCESSED [{errors} ERRORS] {'#'*25}\n")
