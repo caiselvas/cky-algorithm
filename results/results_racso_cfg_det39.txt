@@ -1,14 +1,14 @@
 CFG(
-	C -> DA | DZ | EB | ET | FE | a | b
-	A -> DA | a
-	B -> EB | b
-	D -> a
-	E -> b
-	F -> DY
-	T -> DX | ET | a
+	C -> DB | DT | EA | EZ | FD | a | b
+	A -> EA | a
+	B -> DB | b
+	D -> b
+	E -> a
+	F -> EY
+	T -> DT | EX | a
 	X -> DX | EX | a | b
-	Y -> DA | EB | FE | a | b
-	Z -> DZ | ET
+	Y -> DB | EA | FD | a | b
+	Z -> DT | EZ
 )
 
 * Start Symbol: C

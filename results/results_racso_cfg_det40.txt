@@ -1,10 +1,10 @@
 CFG(
-	A -> DB | EC | FB | GC
-	B -> b
-	C -> a
-	D -> CX | a
-	E -> BX | b
-	F -> BA
+	A -> DB | EB | FC | GC
+	B -> a
+	C -> b
+	D -> CX | b
+	E -> BA
+	F -> BX | a
 	G -> CA
 	X -> BX | CX | a | b
 )

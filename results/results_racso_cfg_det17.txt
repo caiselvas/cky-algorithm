@@ -1,13 +1,13 @@
 CFG(
-	A -> DB | EC | a | b | ϵ
-	B -> a
-	C -> b
-	D -> BK | a
-	E -> CS | b
-	F -> CN | b
-	K -> DB | FC | a
-	N -> EC | b
-	S -> DB | EC | a | b
+	A -> DC | EB | a | b | ϵ
+	B -> b
+	C -> a
+	D -> CK | a
+	E -> BS | b
+	F -> BN | b
+	K -> DC | FB | a
+	N -> EB | b
+	S -> DC | EB | a | b
 )
 
 * Start Symbol: A

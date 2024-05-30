@@ -1,18 +1,18 @@
 CFG(
-	L -> IM | JN | MA | NL | c
-	A -> IM | JN | MA | NB | c
-	B -> IM | JN | MC | NL | c
-	C -> CM | DN
-	D -> DN | EM
-	E -> CM | FN
-	F -> JN | KM | MF | NG | c
-	G -> JN | KM | MD | NH | c
-	H -> JN | KM | MF | NH | c
-	I -> IM | JN | c
-	J -> JN | KM | c
-	K -> IM | c
-	M -> a
-	N -> b
+	L -> IN | JM | ML | NA | c
+	A -> IN | JM | MB | NA | c
+	B -> IN | JM | ML | NC | c
+	C -> CN | DM
+	D -> DM | EN
+	E -> CN | FM
+	F -> JM | KN | MG | NF | c
+	G -> JM | KN | MH | ND | c
+	H -> JM | KN | MH | NF | c
+	I -> IN | JM | c
+	J -> JM | KN | c
+	K -> IN | c
+	M -> b
+	N -> a
 )
 
 * Start Symbol: L

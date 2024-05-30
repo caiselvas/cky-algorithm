@@ -3,17 +3,17 @@ CFG(
 	B -> b
 	C -> c
 	D -> a
-	E -> DT | a
+	E -> DG | a
 	F -> BQ | b
-	H -> TB
-	I -> HQ | TB
+	G -> EB
+	H -> GB
+	I -> GB | HQ
 	Q -> FC
-	T -> EB
 )
 
 * Start Symbol: A
 * Terminal Symbols: {a, b, c, ϵ}
-* Non-Terminal Symbols: {A, B, C, D, E, F, H, I, Q, T}
+* Non-Terminal Symbols: {A, B, C, D, E, F, G, H, I, Q}
 
 ##################################################
 

@@ -1,27 +1,27 @@
 CFG(
-	A -> CN | DN | FB | GX | HB | IC | ID | JC | JD | KC | KD | LB | MX | OX | RD | TC | a | b | ϵ
+	A -> CN | DN | FB | GX | HC | HD | IC | ID | JB | KC | KD | LB | MX | OX | RC | TD | a | b | ϵ
 	B -> c
-	C -> a
-	D -> b
+	C -> b
+	D -> a
 	E -> XB | c
 	F -> EX | XB | c
 	G -> FB
-	H -> CX | a
-	I -> CP
-	J -> BX | c
-	K -> DP
-	L -> DX | b
-	M -> TC | a
+	H -> CP
+	I -> DP
+	J -> DX | a
+	K -> BX | c
+	L -> CX | b
+	M -> TD
 	N -> CN | DN | a | b
-	O -> RD | b
-	P -> HB | IC | ID | JC | JD | KC | KD | LB
-	R -> HB | UC | UD | VC | VD
+	O -> RC
+	P -> HC | HD | IC | ID | JB | KC | KD | LB
+	R -> JB | UC | UD | VC | VD
 	T -> LB | WC | WD | YC | YD
-	U -> CR | a
-	V -> DR | b
-	W -> CT | a
+	U -> CR
+	V -> DR
+	W -> DT
 	X -> BX | CX | DX | a | b | c
-	Y -> DT | b
+	Y -> CT
 )
 
 * Start Symbol: A

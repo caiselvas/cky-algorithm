@@ -15,3 +15,53 @@ CFG(
 
 ##################################################
 
+ϵ -> True
+TREE -> [('A', 'ϵ')]
+
+ab -> True
+TREE -> [('A', ('F', 'a'), ('C', 'b'))]
+
+aabb -> True
+TREE -> [('A', ('F', ('B', 'a'), ('T', ('F', 'a'), ('C', 'b'))), ('C', 'b'))]
+
+aaaaabbbbb -> True
+TREE -> [('A', ('F', ('B', 'a'), ('T', ('F', ('B', 'a'), ('T', ('F', ('B', 'a'), ('T', ('F', ('B', 'a'), ('T', ('F', 'a'), ('C', 'b'))), ('C', 'b'))), ('C', 'b'))), ('C', 'b'))), ('C', 'b'))]
+
+aaaabb -> True
+TREE -> [('A', ('E', ('D', ('B', 'a'), ('B', 'a')), ('S', ('E', ('B', 'a'), ('B', 'a')), ('C', 'b'))), ('C', 'b'))]
+
+aab -> True
+TREE -> [('A', ('E', ('B', 'a'), ('B', 'a')), ('C', 'b'))]
+
+aaaabbb -> True
+TREE -> [('A', ('E', ('D', ('B', 'a'), ('B', 'a')), ('S', ('F', ('B', 'a'), ('T', ('F', 'a'), ('C', 'b'))), ('C', 'b'))), ('C', 'b'))]
+
+aaabb -> True
+TREE -> [('A', ('E', ('D', ('B', 'a'), ('B', 'a')), ('S', ('F', 'a'), ('C', 'b'))), ('C', 'b'))]
+
+aab -> True
+TREE -> [('A', ('E', ('B', 'a'), ('B', 'a')), ('C', 'b'))]
+
+aaabbb -> True
+TREE -> [('A', ('F', ('B', 'a'), ('T', ('F', ('B', 'a'), ('T', ('F', 'a'), ('C', 'b'))), ('C', 'b'))), ('C', 'b'))]
+
+b -> False
+
+bb -> False
+
+aaaaaaaaaaaaabbbbb -> False
+
+abbb -> False
+
+aabbbbb -> False
+
+aabbbbbbb -> False
+
+aaabbbbbb -> False
+
+abababbb -> False
+
+aaabbabbbbbb -> False
+
+aabbbbbb -> False
+

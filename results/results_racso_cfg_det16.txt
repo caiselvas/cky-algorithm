@@ -1,10 +1,10 @@
 CFG(
-	A -> DB | EC | a | b | ϵ
+	A -> DC | EB | a | b | ϵ
 	B -> a
 	C -> b
-	D -> BS | a
-	E -> CS | b
-	S -> DB | EC | a | b
+	D -> CS | b
+	E -> BS | a
+	S -> DC | EB | a | b
 )
 
 * Start Symbol: A

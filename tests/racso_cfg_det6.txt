@@ -3,3 +3,28 @@
 
 CFG
 S -> aSbb | aSb | aS | ϵ
+
+
+# True (10)
+ϵ
+a
+ab
+abb
+aab
+aabb
+aaabbb
+aaaabb
+aaaaab
+aaaabbbb
+
+# False (10)
+b
+bb
+aaabbbbbbbb
+abbb
+aabbbbb
+aaaaabbbbbbbbbbbbb
+aabbbbbbbbbbbb
+abababbbbbbbbb
+aaabbabbbbbbbb
+aabbbbbbb
