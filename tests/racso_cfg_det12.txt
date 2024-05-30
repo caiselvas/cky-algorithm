@@ -11,3 +11,27 @@ B -> Bb | ϵ
 C -> Cc | ϵ
 X -> aXb | ϵ
 Y -> bYc | ϵ
+
+# True (10)
+ϵ
+abc
+aaabbb
+bbbccc
+aabbcc
+aabbbcc
+abccc
+aaabc
+aabbbbbcc
+abbbbc
+
+# False (10)
+abb
+acc
+bcc
+aab
+abb
+accc
+abbccc
+aaabbcccc
+abbccc
+aaab
