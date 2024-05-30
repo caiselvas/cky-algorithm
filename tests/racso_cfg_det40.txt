@@ -4,3 +4,27 @@
 CFG
 S -> aXb | bXa | aSa | bSb
 X -> aX | bX | ϵ
+
+# True (10)
+ab
+ba
+aab
+bba
+abab
+baba
+aabb
+bbaa
+aabab
+abbab
+
+# False (10)
+ϵ
+a
+b
+aa
+bb
+aba
+bab
+abba
+baab
+aaa

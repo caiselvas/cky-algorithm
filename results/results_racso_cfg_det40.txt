@@ -1,11 +1,11 @@
 CFG(
-	A -> DB | EB | FC | GC
-	B -> a
-	C -> b
-	D -> CX | b
-	E -> BA
-	F -> BX | a
-	G -> CA
+	A -> DC | EC | FB | GB
+	B -> b
+	C -> a
+	D -> BX | b
+	E -> CA
+	F -> CX | a
+	G -> BA
 	X -> BX | CX | a | b
 )
 
@@ -14,4 +14,54 @@ CFG(
 * Non-Terminal Symbols: {A, B, C, D, E, F, G, X}
 
 ##################################################
+
+ab -> True
+TREE -> [('A', ('F', 'a'), ('B', 'b'))]
+
+ba -> True
+TREE -> [('A', ('D', 'b'), ('C', 'a'))]
+
+aab -> True
+TREE -> [('A', ('F', ('C', 'a'), ('X', 'a')), ('B', 'b'))]
+
+bba -> True
+TREE -> [('A', ('D', ('B', 'b'), ('X', 'b')), ('C', 'a'))]
+
+abab -> True
+TREE -> [('A', ('F', ('C', 'a'), ('X', ('B', 'b'), ('X', 'a'))), ('B', 'b'))]
+
+baba -> True
+TREE -> [('A', ('D', ('B', 'b'), ('X', ('C', 'a'), ('X', 'b'))), ('C', 'a'))]
+
+aabb -> True
+TREE -> [('A', ('F', ('C', 'a'), ('X', ('C', 'a'), ('X', 'b'))), ('B', 'b'))]
+
+bbaa -> True
+TREE -> [('A', ('D', ('B', 'b'), ('X', ('B', 'b'), ('X', 'a'))), ('C', 'a'))]
+
+aabab -> True
+TREE -> [('A', ('F', ('C', 'a'), ('X', ('C', 'a'), ('X', ('B', 'b'), ('X', 'a')))), ('B', 'b'))]
+
+abbab -> True
+TREE -> [('A', ('F', ('C', 'a'), ('X', ('B', 'b'), ('X', ('B', 'b'), ('X', 'a')))), ('B', 'b'))]
+
+ϵ -> False
+
+a -> False
+
+b -> False
+
+aa -> False
+
+bb -> False
+
+aba -> False
+
+bab -> False
+
+abba -> False
+
+baab -> False
+
+aaa -> False
 

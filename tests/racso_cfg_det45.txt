@@ -11,3 +11,27 @@ T -> aTd | BC
 C -> cC | ϵ
 B -> bB | ϵ
 D -> dD | ϵ
+
+# True (10)
+ϵ
+ab
+ac
+ad
+aabb
+aacc
+aadd
+abc
+abd
+acd
+
+# False (10)
+a
+abb
+acc
+add
+abbcc
+aabc
+abbccc
+aabd
+abbb
+abbbccddd

@@ -22,3 +22,53 @@ CFG(
 
 ##################################################
 
+ϵ -> True
+TREE -> [('A', 'ϵ')]
+
+ab -> True
+TREE -> [('A', ('J', 'a'), ('F', 'b'))]
+
+ac -> True
+TREE -> [('A', ('L', 'a'), ('G', 'c'))]
+
+ad -> True
+TREE -> [('A', ('N', 'a'), ('H', 'd'))]
+
+aabb -> True
+TREE -> [('A', ('J', ('E', 'a'), ('P', ('J', 'a'), ('F', 'b'))), ('F', 'b'))]
+
+aacc -> True
+TREE -> [('A', ('L', ('E', 'a'), ('Q', ('L', 'a'), ('G', 'c'))), ('G', 'c'))]
+
+aadd -> True
+TREE -> [('A', ('N', ('E', 'a'), ('T', ('N', 'a'), ('H', 'd'))), ('H', 'd'))]
+
+abc -> True
+TREE -> [('A', ('P', ('J', 'a'), ('F', 'b')), ('C', 'c')), ('A', ('L', ('E', 'a'), ('Q', 'b')), ('G', 'c'))]
+
+abd -> True
+TREE -> [('A', ('I', ('J', 'a'), ('F', 'b')), ('D', 'd')), ('A', ('N', ('E', 'a'), ('T', 'b')), ('H', 'd'))]
+
+acd -> True
+TREE -> [('A', ('Q', ('L', 'a'), ('G', 'c')), ('D', 'd')), ('A', ('N', ('E', 'a'), ('T', 'c')), ('H', 'd'))]
+
+a -> False
+
+abb -> False
+
+acc -> False
+
+add -> False
+
+abbcc -> False
+
+aabc -> False
+
+abbccc -> False
+
+aabd -> False
+
+abbb -> False
+
+abbbccddd -> False
+
