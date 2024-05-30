@@ -1,15 +1,15 @@
 CFG(
-	C -> FE | GD
-	A -> GD | HE | b
-	B -> FE | ID | a
-	D -> a
-	E -> b
-	F -> EC
-	G -> DA
-	H -> EB
-	I -> DP | a
-	J -> EP | b
-	P -> ID | JE | a | b
+	C -> FD | GE
+	A -> GE | HD | b
+	B -> FD | IE | a
+	D -> b
+	E -> a
+	F -> DC
+	G -> EA
+	H -> DB
+	I -> EP | a
+	J -> DP | b
+	P -> IE | JD | a | b
 )
 
 * Start Symbol: C

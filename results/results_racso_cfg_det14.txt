@@ -1,8 +1,8 @@
 CFG(
-	A -> AC | DB | b
-	B -> a
-	C -> b
-	D -> BA
+	A -> AB | DC | b
+	B -> b
+	C -> a
+	D -> CA
 )
 
 * Start Symbol: A

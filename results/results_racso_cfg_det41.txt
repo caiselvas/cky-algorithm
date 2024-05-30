@@ -1,22 +1,22 @@
 CFG(
-	D -> EC | FB | GA | HG | IX | JF | JG | KX | LX | ME | OE | QF | RF | a | b | c | ϵ
-	A -> GA | a
-	B -> FB | b
+	D -> EC | FA | GB | HF | IX | JF | JG | KX | LX | ME | OG | QE | RG | a | b | c | ϵ
+	A -> FA | a
+	B -> GB | b
 	C -> EC | c
 	E -> c
-	F -> b
-	G -> a
-	H -> XF | b
-	I -> HG
+	F -> a
+	G -> b
+	H -> XG | b
+	I -> HF
 	J -> XE | c
 	K -> JG
 	L -> JF
-	M -> GN
-	N -> EC | GA | ME | OE | QF | a | c
-	O -> FX | b
-	P -> FB | GA | RF | a | b
-	Q -> GX | a
-	R -> GP
+	M -> FN
+	N -> EC | FA | ME | OG | QE | a | c
+	O -> FX | a
+	P -> FA | GB | RG | a | b
+	Q -> GX | b
+	R -> FP
 	X -> EX | FX | GX | a | b | c
 )
 
