@@ -261,32 +261,24 @@ class CKY:
 		return (total_prob > 0, total_prob, parse_trees_with_probs)
 	
 
-	def __transform_probabilistic_to_deterministic(self, parse_trees_with_probs) -> tuple[float, list]:
-		"""
-		Transforms a list of parse trees with their probabilities to a list of parse trees without probabilities.
-
-		Parameters
-		----------
-		parse_trees_with_probs (list): A list of tuples with parse trees and their probabilities.
-
-		Returns
-		-------
-		tuple[float, list]
-			The total probability of the parse trees and the parse trees without probabilities as a list.
-		"""
-		# Calculate the sum of the final probabilities
+	def __transform_probabilistic_to_deterministic(self, parse_trees_with_probs):
+		# Calculate the total probability of the parse trees
 		total_prob = sum(prob for _, prob in parse_trees_with_probs)
+		def remove_probabilities(item):
+			if isinstance(item, tuple):
+				# If the tuple length is 3 and the third element is a float, remove it
+				if len(item) == 3 and isinstance(item[2], float):
+					return remove_probabilities(item[:2])
+				# If the tuple length is 2 and the second element is a float, remove it
+				elif len(item) == 2 and isinstance(item[1], float):
+					return remove_probabilities(item[0])
+				# Otherwise, process each element of the tuple
+				else:
+					return tuple(remove_probabilities(sub_item) for sub_item in item)
+			else:
+				return item
 		
-		# Helper function to remove probabilities from nodes
-		def remove_probs(node):
-			if isinstance(node, tuple) and len(node) > 1:
-				return tuple(remove_probs(child) for child in node if not isinstance(child, float))
-			return node
-		
-		# Transform probabilistic parse trees to deterministic by removing probabilities
-		parse_trees_deterministic = [remove_probs(tree) for tree, _ in parse_trees_with_probs]
-		
-		return total_prob, parse_trees_deterministic
+		return total_prob, [remove_probabilities(item[0]) for item in parse_trees_with_probs]
 	
 
 	def visualize_parse_trees(self, parse_trees_with_probs: list, word: str, prob: bool = True) -> None:
