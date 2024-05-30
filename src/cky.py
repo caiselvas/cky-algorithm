@@ -262,6 +262,18 @@ class CKY:
 	
 
 	def __transform_probabilistic_to_deterministic(self, parse_trees_with_probs):
+		"""
+		Function to transform probabilistic parse trees to deterministic parse trees.
+
+		Parameters
+		----------
+		parse_trees_with_probs (list): A list of tuples with parse trees and their probabilities.
+
+		Returns
+		-------
+		float, list
+			The total probability of the parse trees and the list of parse trees without probabilities.
+		"""
 		# Calculate the total probability of the parse trees
 		total_prob = sum(prob for _, prob in parse_trees_with_probs)
 		def remove_probabilities(item):
