@@ -7,5 +7,5 @@ X -> aX | bX | cX | ϵ
 N -> aN | bN | ϵ
 P -> aXc | bXc | cXa | cXb | aPa | bPb | aPb | bPa
 Q -> RbX | TaX
-R -> aRa | aRb | bRa | bRb | aXc | ϵ
-T -> aTa | aTb | bTa | bTb | bXc | ϵ
+R -> aRa | aRb | bRa | bRb | aXc
+T -> aTa | aTb | bTa | bTb | bXc

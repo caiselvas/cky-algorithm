@@ -6,6 +6,6 @@ S -> XbaX | XcaX | XcbX | N | P | C
 X -> aX | bX | cX | ϵ
 N -> aNc | aXb | bXc | A | cC
 P -> aPb | A | B
-A -> aA | a | ϵ
-B -> bB | b | ϵ
+A -> aA | a
+B -> bB | b
 C -> cC | c | ϵ

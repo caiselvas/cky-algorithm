@@ -2,6 +2,6 @@
 # Write a non-ambiguous CFG generating the words of the form a^i b^j c^k such that the number of b's coincides with the number of a's plus the number of c's.
 
 CFG
-S -> aTb | bQc | aTbbQc |
+S -> aTb | bQc | aTbbQc | ϵ
 T -> aTb | ϵ
 Q -> bQc | ϵ

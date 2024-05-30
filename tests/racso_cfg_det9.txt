@@ -2,6 +2,6 @@
 # Write a non-ambiguous CFG generating the words of the form a^i b^j where the number of a's is at least the number of b's, or it is at most twice the number of b's.
 
 CFG
-S -> aSb | aA | Bb
+S -> aSb | aA | Bb | ϵ
 A -> aA | ϵ
 B -> Bb | ϵ
