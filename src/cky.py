@@ -79,11 +79,11 @@ class CKY:
 		
 		if isinstance(grammar, CFG):
 			if grammar.is_probabilistic():
-				return self.__parse_probabilistic(word=word, grammar=grammar, round_probabilities=round_probabilities, visualize=visualize) # Returns a tuple (bool, float, list)
+				return self.__parse_probabilistic(word, grammar, round_probabilities, visualize) # Returns a tuple (bool, float, list)
 			else:
-				if round_probabilities:
+				if self.grammar is not None:
 					warnings.warn("Rounding probabilities is only available for probabilistic grammars. No rounding will be applied because the grammar is deterministic.", UserWarning)
-				return self.__parse_deterministic(word=word, grammar=grammar, visualize=visualize) # Returns a tuple (bool, list)
+				return self.__parse_deterministic(word, grammar, visualize) # Returns a tuple (bool, list)
 		else:
 			raise ValueError("Invalid grammar type. Expected CFG object.")
 
@@ -107,7 +107,7 @@ class CKY:
 		start_symbol = grammar.get_start_symbol()
 
 		if n == 0:
-			return (grammar.EMPTY in grammar(start_symbol), [])
+			return (grammar.EPSILON in grammar(start_symbol), [])
 
 		# Create a triangular table where table[i] has size (n-i)
 		table = [ [set() for _ in range(n - i)] for i in range(n) ]
@@ -187,8 +187,8 @@ class CKY:
 		start_symbol = grammar.get_start_symbol()
 
 		if n == 0:
-			if grammar.EMPTY in grammar(start_symbol):
-				return (True, grammar.get_probability(start_symbol, grammar.EMPTY), [(grammar.EMPTY, grammar.get_probability(start_symbol, grammar.EMPTY))])
+			if grammar.EPSILON in grammar(start_symbol):
+				return (True, grammar.get_probability(start_symbol, grammar.EPSILON), [(grammar.EPSILON, grammar.get_probability(start_symbol, grammar.EPSILON))])
 			else:
 				return (False, 0.0, [])
 
@@ -261,9 +261,9 @@ class CKY:
 		return (total_prob > 0, total_prob, parse_trees_with_probs)
 	
 
-	def __transform_probabilistic_to_deterministic(self, parse_trees_with_probs) -> tuple[float, list]:
+	def __transform_probabilistic_to_deterministic(self, parse_trees_with_probs):
 		"""
-		Transforms a list of parse trees with their probabilities to a list of parse trees without probabilities.
+		Function to transform probabilistic parse trees to deterministic parse trees.
 
 		Parameters
 		----------
@@ -271,22 +271,26 @@ class CKY:
 
 		Returns
 		-------
-		tuple[float, list]
-			The total probability of the parse trees and the parse trees without probabilities as a list.
+		float, list
+			The total probability of the parse trees and the list of parse trees without probabilities.
 		"""
-		# Calculate the sum of the final probabilities
+		# Calculate the total probability of the parse trees
 		total_prob = sum(prob for _, prob in parse_trees_with_probs)
+		def remove_probabilities(item):
+			if isinstance(item, tuple):
+				# If the tuple length is 3 and the third element is a float, remove it
+				if len(item) == 3 and isinstance(item[2], float):
+					return remove_probabilities(item[:2])
+				# If the tuple length is 2 and the second element is a float, remove it
+				elif len(item) == 2 and isinstance(item[1], float):
+					return remove_probabilities(item[0])
+				# Otherwise, process each element of the tuple
+				else:
+					return tuple(remove_probabilities(sub_item) for sub_item in item)
+			else:
+				return item
 		
-		# Helper function to remove probabilities from nodes
-		def remove_probs(node):
-			if isinstance(node, tuple) and len(node) > 1:
-				return tuple(remove_probs(child) for child in node if not isinstance(child, float))
-			return node
-		
-		# Transform probabilistic parse trees to deterministic by removing probabilities
-		parse_trees_deterministic = [remove_probs(tree) for tree, _ in parse_trees_with_probs]
-		
-		return total_prob, parse_trees_deterministic
+		return total_prob, [remove_probabilities(item[0]) for item in parse_trees_with_probs]
 	
 
 	def visualize_parse_trees(self, parse_trees_with_probs: list, word: str, prob: bool = True) -> None:
