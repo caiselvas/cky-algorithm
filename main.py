@@ -60,33 +60,49 @@ if __name__ == '__main__':
 	all_files = False
 	first_n_files = None
 	while True:
-		file_name = input("Input file [file name | all | help]: ")
-		if not file_name:
+		file_names = input("Input file [file name | all | help]: ").strip()
+		file_names = [f.strip() for f in file_names.split(',')]
+		if not file_names:
 			print("Please provide a valid file name.")
 			continue
 
-		if file_name.lower() == 'help':
-			print("You can input the following commands:")
-			print("\t- A file name to process a specific file in the folder './tests'.")
-			print("\t- 'all' to process all files in the folder './tests'.")
-			continue
+		if len(file_names) > 1:
+			if all(os.path.isfile(os.path.join('./tests', f)) for f in file_names):
+				break
+			else:
+				for f in file_names:	
+					if not os.path.isfile(os.path.join('./tests', f)):
+						print(f"File '{f}' not found. Please provide a valid file names in the folder './tests'.")
+						
+				continue
 		
-		elif file_name.lower() == 'all':
-			all_files = True
-		
-		elif not os.path.isfile(os.path.join('./tests', file_name)):
-			print(f"File '{file_name}' not found. Please provide a valid file name in the folder './tests'.")
-			continue
-		
-		break
+		elif len(file_names) == 1:
+			if file_names[0].lower() == 'help':
+				print("You can input the following commands:")
+				print("\t* A file name to process a specific file in the folder './tests'.")
+				print("\t* Multiple file names separated by commas to process multiple files in the folder './tests'.")
+				print("\t* Introduce 'all' to process all files in the folder './tests'.")
+				continue
+			
+			elif file_names[0].lower() == 'all':
+				all_files = True
+				break
+			
+			elif not os.path.isfile(os.path.join('./tests', file_names[0])):
+				print(f"File '{file_names}' not found. Please provide a valid file name in the folder './tests'.")
+				continue
+			else:
+				break
 
 	# Get the list of files to process
-	files_list = os.listdir('./tests') if all_files else [file_name]
-	total_files = len(files_list)
+	if all_files:
+		file_names = os.listdir('./tests')
+
+	total_files = len(file_names)
 
 	# Process the files
 	errors = 0
-	for file_name in files_list:
+	for file_name in file_names:
 		print(f"\n{'#'*25} RUNNING FILE '{file_name}' {'#'*25}")
 
 		# Open the file
