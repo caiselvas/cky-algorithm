@@ -81,6 +81,9 @@ if __name__ == '__main__':
 	files_list = os.listdir('./tests') if all_files else [file_name]
 
 	for file_name in files_list:
+		print(f"\n{'#'*25} RUNNING FILE '{file_name}' {'#'*25}")
+
+		# Open the file
 		with open(os.path.join('./tests', file_name), 'r', encoding='utf-8') as file:
 			input_text = file.read()
 
