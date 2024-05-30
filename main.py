@@ -88,6 +88,10 @@ if __name__ == '__main__':
 			input_text = file.read()
 
 			# Process the file
-			main(input_text=input_text, file_name=file_name)
+			try:
+				main(input_text=input_text, file_name=file_name)
+			except Exception as e:
+				print(f"Error processing file '{file_name}'. Error message: {e}.\n\nIgnoring file and continuing to the next one.")
+				continue
 
 	print("\nAll files processed successfully!")
