@@ -1,8 +1,0 @@
-# Exercise 13: CFG for {a^n0 b a^n1 b ... a^nm-1 b a^nm | m ≥ 1 ∧ ∃i ∈ {1, ..., m} : (n0 = ni)}
-# Write a CFG (which will be ambiguous) generating the words of the form a^n0 b a^n1 b ... a^nm-1 b a^nm for which there exists an i ∈ {1, ..., m} such that n0 = ni.
-
-CFG
-S -> SbA | Y
-Y -> aYa | bXb | b
-X -> aX | bX | ϵ
-A -> Aa

@@ -1,5 +1,0 @@
-# Exercise 14: Non-ambiguous CFG for {a^n0 b a^n1 b ... a^nm-1 b a^nm | m ≥ 1 ∧ (n0 = ∑ 1≤i≤m ni)}
-# Write a non-ambiguous CFG generating the words of the form a^n0 b a^n1 b ... a^nm-1 b a^nm, with m ≥ 1, such that n0 is equal to the sum n1 + n2 + ... + nm.
-
-CFG
-S -> aSa | Sb | b

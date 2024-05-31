@@ -1,5 +1,0 @@
-# Exercise 16: Non-ambiguous CFG for {w ∈ {a, b}* | w = w^R}
-# Write a non-ambiguous CFG generating the palindromic words over {a, b}.
-
-CFG
-S -> aSa | bSb | a | b | ϵ
