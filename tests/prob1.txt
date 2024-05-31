@@ -4,10 +4,22 @@ A -> BA [0.5] | a [0.5]
 B -> CC [0.7] | b [0.3]
 C -> AB [0.6] | a [0.4]
 
-abab
-abba
-abaa
-a
-aa
-aaab
+# True (8)
+ab
+bab
+aabab
+aaaaab
+abbaba
+bababa
 aaa
+bbaaa
+
+# False(8)
+ϵ
+a
+b
+ac
+bbb
+abb
+baa
+abba
