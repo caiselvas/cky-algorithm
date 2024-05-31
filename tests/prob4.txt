@@ -2,6 +2,30 @@ PCFG
 S -> AB [0.6] | ϵ [0.4]
 A -> a [0.5] | CD [0.5]
 B -> b [0.7] | AC [0.3]
-C -> d
+C -> c
+D -> a
 
+# True (7)
+ϵ
+# 0.4
+ab
+# 0.21
+cab
+# 0.21
+aac
+# 0.045
+acac
+# 0.045
+caac
+# 0.045
+cacac
+# 0.0405
 
+False (7)
+bb
+ba
+ccc
+aaa
+baba
+abab
+a

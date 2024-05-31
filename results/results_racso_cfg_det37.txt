@@ -1,12 +1,12 @@
 CFG(
 	B -> EC | ED | FC | FD
-	A -> EC | ED | GC | GD
-	C -> b
-	D -> a
-	E -> CB
-	F -> DA
-	G -> DQ
-	H -> CQ
+	A -> FC | FD | GC | GD
+	C -> a
+	D -> b
+	E -> CA
+	F -> DB
+	G -> CQ
+	H -> DQ
 	Q -> GC | GD | HC | HD | c
 )
 

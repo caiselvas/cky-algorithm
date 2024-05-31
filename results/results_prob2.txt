@@ -1,29 +1,22 @@
 PCFG(
-	S -> AB [1.0]
-	A -> a [0.6] | ε [0.4]
-	B -> b [0.7] | ε [0.3]
+	S -> AB [0.2] | ϵ [0.8]
+	A -> a [1.0]
+	B -> b [1.0]
 )
 
 * Start Symbol: S
-* Terminal Symbols: {a, b, ε}
+* Terminal Symbols: {a, b, ϵ}
 * Non-Terminal Symbols: {S, A, B}
 
 ##################################################
 
-ab -> True [0.42]
-TREE -> [(('S', ('A', 'a', 0.6), ('B', 'b', 0.7)), 0.42)]
+ab -> True [0.2]
+TREE -> [(('S', ('A', 'a', 1.0), ('B', 'b', 1.0)), 0.2)]
+
+ϵ -> True [0.8]
+TREE -> [(('S', 'ϵ'), 0.8)]
 
 a -> False
 
 b -> False
-
-ε -> False
-
-ba -> False
-
-aa -> False
-
-bb -> False
-
-aba -> False
 

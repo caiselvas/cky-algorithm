@@ -1,9 +1,9 @@
 CFG(
 	A -> DB | EC | a | b | ϵ
-	B -> b
-	C -> a
-	D -> BS | b
-	E -> CS | a
+	B -> a
+	C -> b
+	D -> BS | a
+	E -> CS | b
 	S -> DB | EC | a | b
 )
 

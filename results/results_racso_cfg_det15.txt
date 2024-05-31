@@ -1,11 +1,11 @@
 CFG(
-	B -> BD | BN | DA | EC | b
+	B -> BC | BN | CA | ED | b
 	A -> CA | DA | a | b
-	C -> a
-	D -> b
-	E -> CK
-	K -> BD | EC | b
-	N -> DA | b
+	C -> b
+	D -> a
+	E -> DK
+	K -> BC | ED | b
+	N -> CA | b
 )
 
 * Start Symbol: B

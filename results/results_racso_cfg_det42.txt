@@ -6,22 +6,22 @@ CFG(
 	E -> XB | c
 	F -> EX | XB | c
 	G -> FB
-	H -> BX | c
-	I -> CX | b
+	H -> CP
+	I -> DX | a
 	J -> DP
-	K -> DX | a
-	L -> CP
-	M -> TD
+	K -> CX | b
+	L -> BX | c
+	M -> RC
 	N -> CN | DN | a | b
-	O -> RC
+	O -> TD
 	P -> HC | HD | IB | JC | JD | KB | LC | LD
-	R -> KB | UC | UD | VC | VD
-	T -> IB | WC | WD | YC | YD
+	R -> IB | UC | UD | VC | VD
+	T -> KB | WC | WD | YC | YD
 	U -> DR
 	V -> CR
-	W -> CT
+	W -> DT
 	X -> BX | CX | DX | a | b | c
-	Y -> DT
+	Y -> CT
 )
 
 * Start Symbol: A

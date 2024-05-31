@@ -1,12 +1,12 @@
 CFG(
 	A -> DB | EC | a | b | ϵ
-	B -> b
-	C -> a
-	D -> BS | b
-	E -> CK | a
-	F -> BN | b
-	K -> EC | FB | a
-	N -> DB | b
+	B -> a
+	C -> b
+	D -> BK | a
+	E -> CS | b
+	F -> CN | b
+	K -> DB | FC | a
+	N -> EC | b
 	S -> DB | EC | a | b
 )
 

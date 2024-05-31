@@ -1,13 +1,13 @@
 CFG(
-	B -> EA | FC | GD | b
+	B -> EA | FD | GC | b
 	A -> AD
 	C -> b
 	D -> a
 	E -> BC
-	F -> CX | b
-	G -> DY
+	F -> DY
+	G -> CX | b
 	X -> CX | DX | a | b
-	Y -> FC | GD | b
+	Y -> FD | GC | b
 )
 
 * Start Symbol: B
