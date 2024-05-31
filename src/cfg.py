@@ -834,9 +834,9 @@ class CFG:
 		"""
 		return self.nonterminals
 	
-	def get_rhs(self, symbol: str) -> list:
+	def get_rhs(self, symbol: str) -> set:
 		"""
-		Returns the list of productions for a given symbol.
+		Returns the set of productions for a given symbol.
 
 		Parameters
 		----------
@@ -844,10 +844,10 @@ class CFG:
 
 		Returns
 		-------
-		list
-			List of productions for the given symbol.
+		set
+			Set of productions for the given symbol.
 		"""
-		return self.rules.get(symbol, [])
+		return self.rules.get(symbol, set())
 	
 	def get_probability(self, lhs: str, production: str) -> int|float:
 		"""
