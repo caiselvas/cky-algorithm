@@ -4,9 +4,22 @@ A -> BA | a
 B -> CC | b
 C -> AB | a
 
-aaab
-aabb
-bb
+# True (8)
 ab
+bab
+aabab
+aaaaab
+abbaba
+bababa
 aaa
-abab
+bbaaa
+
+# False(8)
+ϵ
+a
+b
+ac
+bbb
+abb
+baa
+abba
